@@ -3,8 +3,6 @@ import re
 ### Transcribing vowels ###
 '''
 
-NULL_CONSONANT = 'ㅇ'
-
 vowel = {
     # 단모음 monophthongs
     'ㅏ' : 'a',
@@ -95,6 +93,9 @@ coda = {
     None: '',
 }
 
+
+NULL_CONSONANT = 'ㅇ'
+
 unicode_initial = [ 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 unicode_initial = [ chr(initial_code) for initial_code in range(4352, 4371)]
 unicode_medial = [ 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']
@@ -161,16 +162,18 @@ class Pronouncer(object):
             # 자음 앞에서 각각 대표음 [ㄱ, ㄷ, ㅂ]으로 발음한다.
             # <-> 단, 국어의 로마자 표기법 규정에 의해 된소리되기는 표기에 반영하지 않으므로 제외.
             if(syllable.final or final_is_before_C): 
-                if(syllable.final in ['ᆩ', 'ᆿ', 'ᆪ']):
+                if(syllable.final in ['ᆩ', 'ᆿ', 'ᆪ', 'ᆰ']):
                     syllable.final = 'ᆨ'
                 elif(syllable.final in ['ᆺ', 'ᆻ', 'ᆽ', 'ᆾ', 'ᇀ']):
                     syllable.final = 'ᆮ'
-                elif(syllable.final in ['ㅍ', 'ᆹ']):
+                elif(syllable.final in ['ㅍ', 'ᆹ', 'ᆵ']):
                     syllable.final = 'ᆸ'
                 elif(syllable.final in ['ᆬ']):
                     syllable.final = 'ᆫ'
                 elif(syllable.final in ['ᆲ', 'ᆳ', 'ᆴ']):
                     syllable.final = 'ᆯ'
+                elif(syllable.final in ['ᆱ']):
+                    syllable.final = 'ᆷ'
                     
         return self._syllables
                 
@@ -195,4 +198,4 @@ class Romanizer(object):
         return _romanized
     
     
-Pronouncer("앏").pronounced
+Pronouncer("읊").pronounced
