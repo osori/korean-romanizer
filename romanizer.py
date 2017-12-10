@@ -45,30 +45,30 @@ e.g. ㅇ is a null sound when placed in onset, but becomes [ng] in coda.
 # 초성 Choseong (Syllable Onset)
 onset = {
     # 파열음 stops/plosives
-    'ㄱ' : 'g',
-    'ㄲ' : 'kk',
-    'ㅋ' : 'k',
-    'ㄷ' : 'd',
-    'ㄸ' : 'tt',
-    'ㅌ' : 't',
-    'ㅂ' : 'b',
-    'ㅃ' : 'pp',
-    'ㅍ' : 'p',
+    'ᄀ' : 'g',
+    'ᄁ' : 'kk',
+    'ᄏ' : 'k',
+    'ᄃ' : 'd',
+    'ᄄ' : 'tt',
+    'ᄐ' : 't',
+    'ᄇ' : 'b',
+    'ᄈ' : 'pp',
+    'ᄑ' : 'p',
     # 파찰음 affricates
-    'ㅈ' : 'j',
-    'ㅉ' : 'jj',
-    'ㅊ' : 'ch',
+    'ᄌ' : 'j',
+    'ᄍ' : 'jj',
+    'ᄎ' : 'ch',
     # 마찰음 fricatives
-    'ㅅ' : 's',
-    'ㅆ' : 'ss',
-    'ㅎ' : 'h',
+    'ᄉ' : 's',
+    'ᄊ' : 'ss',
+    'ᄒ' : 'h',
     # 비음 nasals
-    'ㄴ' : 'n',
-    'ㅁ' : 'm',
+    'ᄂ' : 'n',
+    'ᄆ' : 'm',
     # 유음 liquids
-    'ㄹ' : 'r',
+    'ᄅ' : 'r',
     # Null sound
-    'ㅇ' : '',
+    'ᄋ' : '',
 }
 
 '''
@@ -80,69 +80,92 @@ Only the seven consonants below may appear in coda position
 
 coda = {
     # 파열음 stops/plosives
-    'ㄱ' : 'k',
-    'ㄷ' : 't',
-    'ㅂ' : 'p',
+    'ᆨ' : 'k',
+    'ᆮ' : 't',
+    'ᆸ' : 'p',
     # 비음 nasals
-    'ㄴ' : 'n',
-    'ㅇ' : 'ng',
-    'ㅁ' : 'm',
+    'ᆫ' : 'n',
+    'ᆼ' : 'ng',
+    'ᆷ' : 'm',
     # 유음 liquids
-    'ㄹ' : 'l',
+    'ᆯ' : 'l',
     
     None: '',
 }
 
 
-NULL_CONSONANT = 'ㅇ'
+NULL_CONSONANT = 'ᄋ'
 
 unicode_initial = [ 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 unicode_initial = [ chr(initial_code) for initial_code in range(4352, 4371)]
 unicode_medial = [ 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']
 
 #unicode_final = [ None,  'ㄱ',  'ㄲ',  'ㄳ',  'ㄴ',  'ㄵ',  'ㄶ',  'ㄷ',  'ㄹ',  'ㄺ',  'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ','ㅀ', 'ㅁ', 'ㅂ', 'ㅄ',  'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
-unicode_final = [ chr(final_code) for final_code in range(0x11a8, 0x11c2)]
+unicode_final = [ chr(final_code) for final_code in range(0x11a8, 0x11c3)]
 unicode_final.insert(0, None)
+
+unicode_compatible_consonants = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
+unicode_compatible_finals =     ['ᆨ', 'ᆩ', 'ᆫ', 'ᆮ', '_', 'ᆯ', 'ᆷ', 'ᆸ', '_', 'ᆺ', 'ᆻ', 'ᆼ', 'ᆽ', '_', 'ᆾ', 'ᆿ', 'ᇀ', 'ᇁ', 'ᇂ']
+
+
 
 class Syllable(object):
     def __init__(self, char):
-        _separated = self.separate_syllable(char)
         self.char = char
-        if (self.is_hangul()):
+        _is_hangul, _separated = self.separate_syllable(char)
+        if (_is_hangul):
             self.initial = unicode_initial[_separated[0]]
             self.medial = unicode_medial[_separated[1]]
             self.final = unicode_final[_separated[2]]
         else:
-            self.initial = self.char
+            self.initial = _separated[0]
             self.medial = None
             self.final = None
-    
+            
     def separate_syllable(self, char):
-        initial = (ord(char)-44032) // 588
-        medial = ((ord(char)-44032) - 588 * initial) // 28
-        final = (((ord(char)-44032) - 588 * initial) - 28 * medial)
-        print("Separate", initial,medial,final)
-        return(initial, medial, final)
+        if (self.is_hangul(char)):
+            initial = (ord(char)-44032) // 588
+            medial = ((ord(char)-44032) - 588 * initial) // 28
+            final = (((ord(char)-44032) - 588 * initial) - 28 * medial)
+            # print("Separate", initial,medial,final)
+        else:
+            initial = ord(char)
+            medial = None
+            final = None
+            # print("NOT_HANGUL Separate", initial,medial,final)
+            
+        return self.is_hangul(char), [initial, medial, final]
     
     def construct_syllable(self, initial, medial, final):
-        initial = ord(initial) - 4352
-        medial = unicode_medial.index(medial)
-        if final is None:
-            final = 0
+        if self.is_hangul(self.char):
+            initial = ord(initial) - 4352
+            medial = unicode_medial.index(medial)
+            if final is None:
+                final = 0
+            else:
+                final = unicode_final.index(final)
+            # print("Construct", initial,medial,final)
+            constructed = chr((((initial * 588) + (medial * 28)) + final) + 44032)
         else:
-            final = unicode_final.index(final)
-        print("Construct", initial,medial,final)
-        constructed = chr((((initial * 588) + (medial * 28)) + final) + 44032)
+            constructed = self.char
+            
+        self.char = constructed
         return constructed
     
-    def is_hangul(self):
-        return True if 0xAC00 <= ord(self.char) <= 0xD7A3 else False
+    def is_hangul(self, char):
+        return True if 0xAC00 <= ord(char) <= 0xD7A3 else False
+    
+    def final_to_initial(self, char):
+        idx = unicode_compatible_finals.index(char)
+        return unicode_initial[idx]
     
     def __repr__(self):
-        return self.construct_syllable(self.initial, self.medial, self.final)
+        self.construct_syllable(self.initial, self.medial, self.final)
+        return self.char
     
     def __str__(self):
-        return self.construct_syllable(self.initial, self.medial, self.final)
+        self.char = self.construct_syllable(self.initial, self.medial, self.final)
+        return self.char
 
 class Pronouncer(object):
     def __init__(self, text):
@@ -154,12 +177,17 @@ class Pronouncer(object):
         for idx, syllable in enumerate(self._syllables):
             try:
                 next_syllable = self._syllables[idx+1]
-                final_is_before_C = syllable.final and next_syllable != NULL_CONSONANT
             except IndexError:
                 next_syllable = None
                 
-            # 1. 받침 ‘ㄲ, ㅋ’, ‘ㅅ, ㅆ, ㅈ, ㅊ, ㅌ’, ‘ㅍ’은 어말 또는 
-            # 자음 앞에서 각각 대표음 [ㄱ, ㄷ, ㅂ]으로 발음한다.
+            try:    
+                final_is_before_C = syllable.final and next_syllable.getattr(initial) not in (None, NULL_CONSONANT)
+            except AttributeError:
+                final_is_before_C = False
+            
+            # 1. 받침 ‘ㄲ, ㅋ’, ‘ㅅ, ㅆ, ㅈ, ㅊ, ㅌ’, ‘ㅍ’은 어말 또는 자음 앞에서 각각 대표음 [ㄱ, ㄷ, ㅂ]으로 발음한다.
+            # 2. 겹받침 ‘ㄳ’, ‘ㄵ’, ‘ㄼ, ㄽ, ㄾ’, ‘ㅄ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㄴ, ㄹ, ㅂ]으로 발음한다.
+            # 3. 겹받침 ‘ㄺ, ㄻ, ㄿ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㅁ, ㅂ]으로 발음한다.
             # <-> 단, 국어의 로마자 표기법 규정에 의해 된소리되기는 표기에 반영하지 않으므로 제외.
             if(syllable.final or final_is_before_C): 
                 if(syllable.final in ['ᆩ', 'ᆿ', 'ᆪ', 'ᆰ']):
@@ -174,6 +202,32 @@ class Pronouncer(object):
                     syllable.final = 'ᆯ'
                 elif(syllable.final in ['ᆱ']):
                     syllable.final = 'ᆷ'
+            
+            
+            # 4. 받침 ‘ㅎ’의 발음은 다음과 같다.
+            if(syllable.final == 'ᇂ'):
+                if next_syllable:
+                    # ‘ㅎ(ㄶ, ㅀ)’ 뒤에 ‘ㄱ, ㄷ, ㅈ’이 결합되는 경우에는, 뒤 음절 첫소리와 합쳐서 [ㅋ, ㅌ, ㅊ]으로 발음한다.
+                    # ‘ㅎ(ㄶ, ㅀ)’ 뒤에 ‘ㅅ’이 결합되는 경우에는, ‘ㅅ’을 [ㅆ]으로 발음한다.
+                    if next_syllable.initial in ['ᄀ', 'ᄃ', 'ᄌ', 'ᄉ']:
+                        change_to = {'ᄀ': 'ᄏ','ᄃ': 'ᄐ','ᄌ':'ᄎ', 'ᄉ': 'ᄊ'}
+                        syllable.final = None
+                        next_syllable.initial = change_to[next_syllable.initial]
+                    # 3. ‘ㅎ’ 뒤에 ‘ㄴ’이 결합되는 경우에는, [ㄴ]으로 발음한다.
+                    elif next_syllable.initial in ['ᄂ']:
+                        # TODO: [붙임] ‘ㄶ, ㅀ’ 뒤에 ‘ㄴ’이 결합되는 경우에는, ‘ㅎ’을 발음하지 않는다.
+                        syllable.final = 'ᆫ'
+                    elif next_syllable.initial == NULL_CONSONANT:
+                        syllable.final = None
+                    else: syllable.final =None
+                else:
+                    syllable.final = None
+            # 5. 홑받침이나 쌍받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는, 
+            # 제 음가대로 뒤 음절 첫소리로 옮겨 발음한다. 
+            if next_syllable and final_is_before_C:
+                if(next_syllable.initial == NULL_CONSONANT):
+                    next_syllable.initial = next_syllable.final_to_initial(syllable.final)
+                    syllable.final = None
                     
         return self._syllables
                 
@@ -183,19 +237,17 @@ class Romanizer(object):
         self.text = text
 
     def romanize(self):
+        pronounced = Pronouncer(self.text).pronounced
         hangul = r"[가-힣ㄱ-ㅣ]"
         _romanized = ""
-        for char in self.text:
+        for char in pronounced:
             if (re.match(hangul, char)):
                 s = Syllable(char)
-                try:
-                    _romanized += onset[s.initial] + vowel[s.medial] + coda[s.final]
-                except TypeError:
-                    _romanized += "[에러:" + s.char + "]"
+                #try:
+                _romanized += onset[s.initial] + vowel[s.medial] + coda[s.final]
+                #except Exception as e:
+                #    _romanized += "[에러:" + str(e) + "]"
             else:
                 _romanized += char
 
         return _romanized
-    
-    
-Pronouncer("읊").pronounced
