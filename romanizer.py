@@ -268,8 +268,6 @@ class Pronouncer(object):
                     
             # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는, 
             # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
-            #print(syllable.final in double_consonant_final)
-            # print(syllable.final)
             if syllable.final in double_consonant_final:
                 double_consonant = double_consonant_final[syllable.final]
                 syllable.final = double_consonant[0]
