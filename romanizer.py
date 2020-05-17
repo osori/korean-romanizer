@@ -93,6 +93,8 @@ coda = {
     None: '',
 }
 
+coda['ᇁ'] = 'p'
+
 double_consonant_final = {
     'ㄳ' : ('ㄱ', 'ㅅ'),
     'ㄵ' : ('ᆫ', 'ㅈ'), 
