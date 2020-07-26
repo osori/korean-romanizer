@@ -8,7 +8,7 @@ It currently follows the [Revised Romanization of Korean](https://www.korean.go.
 
 ### Basic Usage
 ```python
-import romanizer from Romanizer
+from romanizer import Romanizer
 
 r = Romanizer("안녕하세요")
 r.romanize() # outputs 'annyeonghaseyo'
