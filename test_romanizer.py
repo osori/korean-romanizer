@@ -13,3 +13,8 @@ def test_spaced_text():
 
 def test_special_case():
     assert romanize("앞만") == "apman"
+
+def test_coda_g_d_b():
+    assert romanize("밝다") == "bakda"
+    assert romanize("바닷가") == "badatga"
+    assert romanize("없다") == "eopda"
