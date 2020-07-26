@@ -11,6 +11,11 @@ def test_simple():
 def test_spaced_text():
     assert romanize("아이유 방탄소년단") == "aiyu bangtansonyeondan"
 
+def test_onset_g_d_b():
+    assert romanize("구미") == "gumi"
+    assert romanize("영동") == "yeongdong"
+    assert romanize("한밭") == "hanbat"
+
 def test_coda_g_d_b():
     assert romanize("밝다") == "bakda"
     assert romanize("바닷가") == "badatga"
