@@ -93,8 +93,6 @@ coda = {
     None: '',
 }
 
-coda['ᇁ'] = 'p'
-
 double_consonant_final = {
     'ㄳ' : ('ㄱ', 'ㅅ'),
     'ㄵ' : ('ᆫ', 'ㅈ'), 
@@ -215,7 +213,7 @@ class Pronouncer(object):
                     syllable.final = 'ᆨ'
                 elif(syllable.final in ['ᆺ', 'ᆻ', 'ᆽ', 'ᆾ', 'ᇀ']):
                     syllable.final = 'ᆮ'
-                elif(syllable.final in ['ㅍ', 'ᆹ', 'ᆵ']):
+                elif(syllable.final in ['ᇁ', 'ᆹ', 'ᆵ']):
                     syllable.final = 'ᆸ'
                 elif(syllable.final in ['ᆬ']):
                     syllable.final = 'ᆫ'
