@@ -21,3 +21,9 @@ def test_coda_g_d_b():
     assert romanize("바닷가") == "badatga"
     assert romanize("없다") == "eopda"
     assert romanize("앞만") == "apman"
+
+def test_r_l():
+    assert romanize("구리") == "guri"
+    assert romanize("설악") == "seorak"
+    assert romanize("울릉") == "ulleung"
+    assert romanize("대관령") == "daegwallyeong"
