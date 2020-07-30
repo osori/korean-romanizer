@@ -195,7 +195,7 @@ class Pronouncer(object):
                 next_syllable = None
                 
             try:    
-                final_is_before_C = syllable.final and next_syllable.getattr(initial) not in (None, NULL_CONSONANT)
+                final_is_before_C = syllable.final and next_syllable.initial not in (None, NULL_CONSONANT)
             except AttributeError:
                 final_is_before_C = False
                 
