@@ -2,7 +2,6 @@ unicode_initial = [ 'ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ
 unicode_initial = [ chr(initial_code) for initial_code in range(4352, 4371)]
 unicode_medial = [ 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ', 'ㅘ', 'ㅙ', 'ㅚ', 'ㅛ', 'ㅜ', 'ㅝ', 'ㅞ', 'ㅟ', 'ㅠ', 'ㅡ', 'ㅢ', 'ㅣ']
 
-#unicode_final = [ None,  'ㄱ',  'ㄲ',  'ㄳ',  'ㄴ',  'ㄵ',  'ㄶ',  'ㄷ',  'ㄹ',  'ㄺ',  'ㄻ', 'ㄼ', 'ㄽ', 'ㄾ', 'ㄿ','ㅀ', 'ㅁ', 'ㅂ', 'ㅄ',  'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 unicode_final = [ chr(final_code) for final_code in range(0x11a8, 0x11c3)]
 unicode_final.insert(0, None)
 
@@ -27,12 +26,10 @@ class Syllable(object):
             initial = (ord(char)-44032) // 588
             medial = ((ord(char)-44032) - 588 * initial) // 28
             final = (((ord(char)-44032) - 588 * initial) - 28 * medial)
-            # print("Separate", initial,medial,final)
         else:
             initial = ord(char)
             medial = None
             final = None
-            # print("NOT_HANGUL Separate", initial,medial,final)
             
         return self.is_hangul(char), [initial, medial, final]
     
@@ -44,7 +41,6 @@ class Syllable(object):
                 final = 0
             else:
                 final = unicode_final.index(final)
-            # print("Construct", initial,medial,final)
             constructed = chr((((initial * 588) + (medial * 28)) + final) + 44032)
         else:
             constructed = self.char
