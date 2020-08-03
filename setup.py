@@ -3,13 +3,13 @@ setup(
   name = 'korean_romanizer',
   packages = ['korean_romanizer'],
   version = '0.1',
-  license='MIT',
+  license='GNU GPLv3',
   description = 'A python library for Korean romanization',
   author = 'Ilkyu Ju',
   author_email = 'ju.ilkyu@gmail.com',
   url = 'https://github.com/osori/korean-romanizer',
-  download_url = 'https://github.com/user/reponame/archive/v_01.tar.gz',
-  keywords = ['SOME', 'MEANINGFULL', 'KEYWORDS'],
+  download_url = 'https://github.com/osori/korean-romanizer/archive/v_01.tar.gz',
+  keywords = ['Korean', 'Romanization', 'Transliteration'],
   install_requires=[
       ],
   classifiers=[
