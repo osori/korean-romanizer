@@ -6,10 +6,16 @@ It currently follows the [Revised Romanization of Korean](https://www.korean.go.
 
 ## Usage
 
+### Installation
+```bash
+pip install korean_romanizer
+```
+
 ### Basic Usage
 ```python
 from korean_romanizer.romanizer import Romanizer
 
 r = Romanizer("안녕하세요")
-r.romanize() # outputs 'annyeonghaseyo'
+r.romanize() 
+# returns 'annyeonghaseyo'
 ```
