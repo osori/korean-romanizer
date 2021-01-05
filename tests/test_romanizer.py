@@ -27,3 +27,7 @@ def test_r_l():
     assert romanize("설악") == "seorak"
 #    assert romanize("울릉") == "ulleung"
 #    assert romanize("대관령") == "daegwallyeong"
+
+def test_coda_ng():
+    assert romanize("강약") == "gangyak"
+    assert romanize("강원") == "gangwon"
