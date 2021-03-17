@@ -32,3 +32,4 @@ def test_next_syllable_null_initial():
     assert romanize("강약") == "gangyak"
     assert romanize("강원") == "gangwon"
     assert romanize("좋아하고") == "joahago"
+    assert romanize("좋은") == "joeun"
