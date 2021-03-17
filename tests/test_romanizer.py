@@ -33,3 +33,8 @@ def test_next_syllable_null_initial():
     assert romanize("강원") == "gangwon"
     assert romanize("좋아하고") == "joahago"
     assert romanize("좋은") == "joeun"
+
+
+def test_non_syllables():
+    assert romanize("ㅠㄴㅁㄱ") == "ㅠㄴㅁㄱ"
+    assert romanize("ㅠ동") == "ㅠdong"
