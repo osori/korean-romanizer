@@ -48,7 +48,7 @@ class Syllable(object):
         return constructed
     
     def is_hangul(self, char):
-        return True if 0xAC00 <= ord(char) <= 0xD7A3 else False
+        return 0xAC00 <= ord(char) <= 0xD7A3
     
     def final_to_initial(self, char):
         idx = unicode_compatible_finals.index(char)
