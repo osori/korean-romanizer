@@ -4,6 +4,11 @@ unicode_medial = [ 'ㅏ', 'ㅐ', 'ㅑ', 'ㅒ', 'ㅓ', 'ㅔ', 'ㅕ', 'ㅖ', 'ㅗ'
 unicode_final = [ chr(final_code) for final_code in range(0x11a8, 0x11c3)]
 unicode_final.insert(0, None)
 
+unicode_offset = 44032
+unicode_initial_offset = 588
+unicode_medial_offset = 28
+
+
 unicode_compatible_consonants = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 unicode_compatible_finals =     ['ᆨ', 'ᆩ', 'ᆫ', 'ᆮ', '_', 'ᆯ', 'ᆷ', 'ᆸ', '_', 'ᆺ', 'ᆻ', 'ᆼ', 'ᆽ', '_', 'ᆾ', 'ᆿ', 'ᇀ', 'ᇁ', 'ᇂ']
 
@@ -22,9 +27,9 @@ class Syllable(object):
             
     def separate_syllable(self, char):
         if (self.is_hangul(char)):
-            initial = (ord(char)-44032) // 588
-            medial = ((ord(char)-44032) - 588 * initial) // 28
-            final = (((ord(char)-44032) - 588 * initial) - 28 * medial)
+            initial = (ord(char) - unicode_offset) // unicode_initial_offset
+            medial = ((ord(char) - unicode_offset) - unicode_initial_offset * initial) // unicode_medial_offset
+            final = (((ord(char) - unicode_offset) - unicode_initial_offset * initial) - unicode_medial_offset * medial)
         else:
             initial = ord(char)
             medial = None
@@ -40,7 +45,7 @@ class Syllable(object):
                 final = 0
             else:
                 final = unicode_final.index(final)
-            constructed = chr((((initial * 588) + (medial * 28)) + final) + 44032)
+            constructed = chr((((initial * unicode_initial_offset) + (medial * unicode_medial_offset)) + final) + unicode_offset)
         else:
             constructed = self.char
             
