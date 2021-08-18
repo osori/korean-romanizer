@@ -4,14 +4,14 @@
 	import LayoutGrid, { Cell } from '@smui/layout-grid';
 	import CharacterCounter from '@smui/textfield/character-counter/index';
 	import Button, { Label } from '@smui/button';
-		
-  let inputText = '';
+	
+	let inputText = '';
 	let romanizedText = '';
 	let isRomanizing = false;
 	
 	const romanize = async () => {
 		isRomanizing = true;
-		const response = await fetch('api/romanize_test');
+		const response = await fetch('api/romanize/' + inputText);
     romanizedText = await response.text();
 		isRomanizing = false;
 	}
