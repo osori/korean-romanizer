@@ -1,1 +1,2 @@
 korean_romanizer==0.22
+Flask==2.0.1
