@@ -3,7 +3,7 @@ from korean_romanizer.romanizer import Romanizer
 
 app = Flask(__name__)
 
-@app.route("/romanize/<text>/", methods=["GET"])
+@app.route("/romanize/<text>", methods=["GET"])
 def romanize(text):
     r = Romanizer(text)
     romanized = r.romanize()
