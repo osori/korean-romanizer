@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 from korean_romanizer.romanizer import Romanizer
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 class handler(BaseHTTPRequestHandler):
 
