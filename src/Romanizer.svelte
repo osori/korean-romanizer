@@ -1,9 +1,9 @@
 <script>
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text/index';
-	import LayoutGrid, { Cell } from '@smui/layout-grid';
-	import CharacterCounter from '@smui/textfield/character-counter/index';
-	import Button, { Label } from '@smui/button';
+  import LayoutGrid, { Cell } from '@smui/layout-grid';
+  import CharacterCounter from '@smui/textfield/character-counter/index';
+  import Button, { Label } from '@smui/button';
 		
   let inputText = '';
 </script>
