@@ -4,9 +4,8 @@ from korean_romanizer.romanizer import Romanizer
 
 app = Flask(__name__)
 
-@app.route("/")
-def romanize():
-    text = request.args.get("text")
+@app.route("/<text>")
+def romanize(text):
     r = Romanizer(text)
     romanized = r.romanize()
     return romanized
