@@ -1,20 +1,20 @@
 <script>
   import Textfield from '@smui/textfield';
   import HelperText from '@smui/textfield/helper-text/index';
-  import LayoutGrid, { Cell } from '@smui/layout-grid';
-  import CharacterCounter from '@smui/textfield/character-counter/index';
-  import Button, { Label } from '@smui/button';
+	import LayoutGrid, { Cell } from '@smui/layout-grid';
+	import CharacterCounter from '@smui/textfield/character-counter/index';
+	import Button, { Label } from '@smui/button';
 		
   let inputText = '';
 	let romanizedText = '';
 	let isRomanizing = false;
 	
-	const romanize = (async () => {
+	const romanize = async () => {
 		isRomanizing = true;
 		const response = await fetch('api/romanize_test');
     romanizedText = await response.text();
 		isRomanizing = false;
-	})()
+	}
 </script>
 
 <LayoutGrid>
