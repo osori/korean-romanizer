@@ -18,7 +18,7 @@
   .icon {
     width: 24px;
 		height: 24px;
-		color: pink;
+		color: #ff8a80;
 		left: 50% !important;
 		margin-left: 0.5em;
   }
@@ -28,8 +28,4 @@
 	<span>Powered by the <a href="https://github.com/osori/korean-romanizer" target="_blank">korean-romanizer</a> library</span><div class="icon">
 		<MdFavorite />
 	</div>
-<!-- 	<Button style="width:100%">
-		<FaGithub style="width:24px;" />
-		<Label style="left: -10;">korean-romanizer by @osori</Label>
-	</Button> -->
 </div>

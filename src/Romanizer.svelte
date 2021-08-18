@@ -50,12 +50,13 @@
 		 </div>
   </Cell>
 	
-	<Cell spanDevices={{ desktop: 2, tablet: 1, phone: 0 }}></Cell>
-	<Cell spanDevices={{ desktop: 8, tablet: 6, phone: 4 }}>
+	<Cell spanDevices={{ desktop: 3, tablet: 1, phone: 0 }}></Cell>
+	<Cell spanDevices={{ desktop: 6, tablet: 6, phone: 4 }}>
     <div style="display:flex; justify-content: center; align-items: center;">
 			<Button
+				variant="outlined"
 				style="width:100%; font-family: 'Roboto', sans-serif; font-weight: 500;"
-				on:click={romanize} variant="raised">
+				on:click={romanize}>
 				{#if isRomanizing === true}
 						<Label>Romanizing...</Label>
 				{:else}
@@ -64,6 +65,6 @@
 			</Button>
 		 </div>
   </Cell>
-	<Cell spanDevices={{ desktop: 2, tablet: 1, phone: 0 }}></Cell>
+	<Cell spanDevices={{ desktop: 3, tablet: 1, phone: 0 }}></Cell>
 	
 </LayoutGrid>
