@@ -6,6 +6,15 @@
   import Button, { Label } from '@smui/button';
 		
   let inputText = '';
+	let romanizedText = '';
+	let isRomanizing = false;
+	
+	const romanize = (async () => {
+		isRomanizing = true;
+		const response = await fetch('api/romanize_test');
+    romanizedText = await response.text();
+		isRomanizing = false;
+	})()
 </script>
 
 <LayoutGrid>
@@ -33,7 +42,7 @@
 				input$style="font-family: 'Noto Sans KR', sans-serif;"
 				textarea
 				style="width: 100%; background-color:whitesmoke; color:#FFF"
-				bind:value={inputText}
+				bind:value={romanizedText}
 				label="Romanized Result"
 			>
 			  <CharacterCounter style="visibility: hidden;" slot="internalCounter" />
@@ -46,8 +55,12 @@
     <div style="display:flex; justify-content: center; align-items: center;">
 			<Button
 				style="width:100%; font-family: 'Roboto', sans-serif; font-weight: 500;"
-				on:click={() => alert("Clicked")} variant="raised">
-				<Label>Romanize</Label>
+				on:click={romanize} variant="raised">
+				{#if isRomanizing === true}
+						<Label>Romanizing...</Label>
+				{:else}
+						<Label>Romanize</Label>
+				{/if}
 			</Button>
 		 </div>
   </Cell>
