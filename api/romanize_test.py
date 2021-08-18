@@ -10,5 +10,5 @@ class handler(BaseHTTPRequestHandler):
 
     r = Romanizer("안녕하세요")
     romanized = r.romanize()
-    self.wfile.write(romanized)
+    self.wfile.write(romanized.encode())
     return
