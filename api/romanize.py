@@ -9,7 +9,9 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Content-type','text/plain')
         self.end_headers()
 
-        args = parse_qs(self.path[2:])
+
+        path = self.path.split('?')[-1]
+        args = parse_qs(path)
         text = args.get("text", [""])[0]
 
         r = Romanizer(text)
