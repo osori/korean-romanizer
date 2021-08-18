@@ -30,7 +30,7 @@
 				input$maxlength="100"
 			>
 				<CharacterCounter slot="internalCounter">0 / 100</CharacterCounter>
-				<HelperText slot="helper">Enter the word or phrase you want to translate.</HelperText>
+				<HelperText slot="helper">Enter the word or phrase you want to romanize.</HelperText>
 			</Textfield>
 		 </div>
   </Cell>
