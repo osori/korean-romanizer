@@ -8,6 +8,7 @@
 	import TopBar from './TopBar.svelte';
 	import Romanizer from './Romanizer.svelte';
 	import Footer from './Footer.svelte';
+	
 	import "./smui.css";
 </script>
 
@@ -26,6 +27,11 @@
 					}
 	 }
 </style>
+
+<svelte:head>
+	<title>Korean Romanizer</title>
+	<html lang="en" />
+</svelte:head>
 
 <div class="container">
 	<TopBar />
