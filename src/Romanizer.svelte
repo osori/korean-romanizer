@@ -11,7 +11,7 @@
 	
 	const romanize = async () => {
 		isRomanizing = true;
-		const response = await fetch('api/romanize/' + inputText);
+		const response = await fetch('api/romanize/?text=' + inputText);
     romanizedText = await response.text();
 		isRomanizing = false;
 	}
