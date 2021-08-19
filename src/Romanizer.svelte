@@ -3,11 +3,13 @@
   import HelperText from "@smui/textfield/helper-text/index";
   import LayoutGrid, { Cell } from "@smui/layout-grid";
   import CharacterCounter from "@smui/textfield/character-counter/index";
-  import Button, { Label } from "@smui/button";
+  import Button, { Label, Icon } from "@smui/button";
+  import Paper from "@smui/paper";
 
   let inputText = "";
   let romanizedText = "";
   let isRomanizing = false;
+  let isFetchingRandomSentence = false;
 
   const romanize = async () => {
     isRomanizing = true;
@@ -15,40 +17,71 @@
     romanizedText = await response.text();
     isRomanizing = false;
   };
+
+  const get_random_sentence = async () => {
+    isFetchingRandomSentence = true;
+    const response = await fetch("api/random_sentence");
+    inputText = await response.text();
+    isFetchingRandomSentence = false;
+    romanize();
+  };
 </script>
 
 <LayoutGrid>
   <Cell spanDevices={{ desktop: 6, tablet: 4, phone: 4 }}>
-    <div class="text-field">
-      <Textfield
-        textarea
-        style="width: 100%;"
-        input$style="font-family: 'Noto Sans KR', sans-serif;"
-        helperLine$style="width: 100%;"
-        bind:value={inputText}
-        label="Text Input"
-        input$maxlength="100"
-      >
-        <CharacterCounter slot="internalCounter">0 / 100</CharacterCounter>
-        <HelperText slot="helper"
-          >Enter the word or phrase you want to romanize.</HelperText
+    <div class="input-container">
+      <Paper elevation={0}>
+        <Button
+          disabled={isFetchingRandomSentence}
+          color="secondary"
+          on:click={get_random_sentence}
         >
-      </Textfield>
+          <Icon class="material-icons">shuffle</Icon>
+          <Label>Try a random sentence</Label>
+        </Button>
+        <Textfield
+          textarea
+          style="width: 100%;"
+          input$style="font-family: 'Noto Sans KR', sans-serif;"
+          helperLine$style="width: 100%;"
+          bind:value={inputText}
+          label="Korean Text"
+          input$maxlength="100"
+        >
+          <CharacterCounter slot="internalCounter">0 / 100</CharacterCounter>
+          <HelperText slot="helper"
+            >Enter a Korean word or phrase you want to romanize.</HelperText
+          >
+        </Textfield>
+      </Paper>
     </div>
   </Cell>
   <Cell spanDevices={{ desktop: 6, tablet: 4, phone: 4 }}>
-    <div class="text-field">
-      <Textfield
-        input$readonly="true"
-        input$maxlength="10000"
-        input$style="font-family: 'Noto Sans KR', sans-serif;"
-        textarea
-        style="width: 100%; background-color:whitesmoke; color:#FFF"
-        bind:value={romanizedText}
-        label="Romanized Result"
-      >
-        <CharacterCounter style="visibility: hidden;" slot="internalCounter" />
-      </Textfield>
+    <div class="input-container">
+      <Paper elevation={0}>
+        <Button
+          style="float: right;"
+          color="secondary"
+          on:click={() => alert("Your issue was reported!")}
+        >
+          <Icon class="material-icons">flag</Icon>
+          <Label>Report an issue</Label>
+        </Button>
+        <Textfield
+          input$readonly="true"
+          input$maxlength="10000"
+          input$style="font-family: 'Noto Sans KR', sans-serif;"
+          textarea
+          style="width: 100%; background-color:whitesmoke; color:#FFF"
+          bind:value={romanizedText}
+          label="Romanized Result"
+        >
+          <CharacterCounter
+            style="visibility: hidden;"
+            slot="internalCounter"
+          />
+        </Textfield>
+      </Paper>
     </div>
   </Cell>
 
@@ -56,6 +89,7 @@
   <Cell spanDevices={{ desktop: 6, tablet: 6, phone: 4 }}>
     <div style="display:flex; justify-content: center; align-items: center;">
       <Button
+        disabled={isRomanizing}
         variant="outlined"
         style="width:100%; font-family: 'Roboto', sans-serif; font-weight: 500;"
         on:click={romanize}
@@ -70,3 +104,11 @@
   </Cell>
   <Cell spanDevices={{ desktop: 3, tablet: 1, phone: 0 }} />
 </LayoutGrid>
+
+<style>
+  .input-container {
+    height: 90%;
+    padding: 4px 18px 18px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+</style>

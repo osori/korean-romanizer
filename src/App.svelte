@@ -23,6 +23,11 @@
   <Footer />
 </div>
 
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/icon?family=Material+Icons"
+/>
+
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR&family=Roboto:wght@300;500;900&display=swap");
 
