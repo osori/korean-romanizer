@@ -24,11 +24,4 @@ class handler(BaseHTTPRequestHandler):
 
         result = requests.post(WEBHOOK_URL, json = data)
 
-        try:
-            result.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            self.wfile.write(str(err).encode())
-        else:
-            self.wfile.write(str(result.status_code).encode())
-        
         return
