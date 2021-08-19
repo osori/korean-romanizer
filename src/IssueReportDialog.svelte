@@ -3,19 +3,22 @@
   import Button, { Label } from "@smui/button";
   import Paper from "@smui/paper";
 
-  import "@typeform/embed/build/css/widget.css";
-
   export let open;
   export let srcText;
   export let tgtText;
 
   const submitReport = async () => {
+    const content = JSON.stringify({
+      srcText,
+      tgtText,
+    });
+    const headers = new Headers();
+    headers.append("Content-Type", "text/plain;charset=utf-8");
+    headers.append("Content-Length", content.length);
     await fetch("api/bug_report", {
       method: "POST",
-      body: JSON.stringify({
-        srcText,
-        tgtText,
-      }),
+      body: content,
+      headers: headers,
     });
 
     open = false;
