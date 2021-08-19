@@ -9,6 +9,10 @@ WEBHOOK_URL = os.environ.get('BUG_REPORT_WEBHOOK_URL')
 class handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+        
         ctype, pdict = cgi.parse_header(self.headers['content-type'])
         clen = int(self.headers['content-length'])
 
