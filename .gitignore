@@ -1,3 +1,5 @@
 
 *.pyc
 .cache/v/cache/lastfailed
+node_modules/*
+public/build/*

@@ -21,6 +21,7 @@ def test_coda_g_d_b():
     assert romanize("바닷가") == "badatga"
     assert romanize("없다") == "eopda"
     assert romanize("앞만") == "apman"
+    assert romanize("읊다") == "eupda"
 
 def test_r_l():
     assert romanize("구리") == "guri"
@@ -34,6 +35,18 @@ def test_next_syllable_null_initial():
     assert romanize("좋아하고") == "joahago"
     assert romanize("좋은") == "joeun"
 
+def test_double_consonant_final_and_next_syllable_null_initial():
+    assert romanize("했었어요") == "haesseosseoyo"
+    assert romanize("없었다") == "eopseotda"
+    assert romanize("앉아봐") == "anjabwa"
+    assert romanize("닭의") == "dalgui"
+    assert romanize("밟아") == "balba"
+    assert romanize("닮았네") == "dalmatne"
+    assert romanize("삯을") == "sakseul"
+    assert romanize("앓았다") == "aratda"
+    assert romanize("읊어 보거라") == "eulpeo bogeora"
+    assert romanize("곬이") == "golssi"
+    assert romanize("훑어보다") == "hulteoboda"
 
 def test_non_syllables():
     assert romanize("ㅠㄴㅁㄱ") == "ㅠㄴㅁㄱ"

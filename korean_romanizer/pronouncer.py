@@ -1,17 +1,17 @@
 from korean_romanizer.syllable import Syllable
 
 double_consonant_final = {
-    'ㄳ' : ('ㄱ', 'ㅅ'),
-    'ㄵ' : ('ᆫ', 'ㅈ'),
+    'ᆪ' : ('ᆨ', 'ᆺ'),
+    'ᆬ' : ('ᆫ', 'ᆽ'),
     'ᆭ' : ('ᆫ', 'ᇂ'),
-    'ㄺ' : ('ㄹ', 'ㄱ'),
-    'ㄻ' : ('ㄹ', 'ㅁ'),
-    'ㄼ' : ('ㄹ', 'ㅂ'),
-    'ㄽ' : ('ㄹ', 'ㅅ'),
-    'ㄾ' : ('ㄹ', 'ㅌ'),
-    'ㄿ' : ('ㄹ', 'ㅍ'),
+    'ᆰ' : ('ᆯ', 'ᆨ'),
+    'ᆱ' : ('ᆯ', 'ᆷ'),
+    'ᆲ' : ('ᆯ', 'ᆸ'),
+    'ᆳ' : ('ᆯ', 'ᆻ'),
+    'ᆴ' : ('ᆯ', 'ᇀ'),
+    'ᆵ' : ('ᆯ', 'ᇁ'),
     'ㅀ' : ('ㄹ', 'ᇂ'),
-    'ㅄ' : ('ㅂ', 'ㅅ'),
+    'ᆹ' : ('ᆸ', 'ᆺ'),
     'ㅆ' : ('ㅅ', 'ㅅ')
 }
 
@@ -40,11 +40,13 @@ class Pronouncer(object):
             except AttributeError:
                 final_is_before_V = False
 
+            is_last_syllable = syllable.final and next_syllable is None
+
             # 1. 받침 ‘ㄲ, ㅋ’, ‘ㅅ, ㅆ, ㅈ, ㅊ, ㅌ’, ‘ㅍ’은 어말 또는 자음 앞에서 각각 대표음 [ㄱ, ㄷ, ㅂ]으로 발음한다.
             # 2. 겹받침 ‘ㄳ’, ‘ㄵ’, ‘ㄼ, ㄽ, ㄾ’, ‘ㅄ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㄴ, ㄹ, ㅂ]으로 발음한다.
             # 3. 겹받침 ‘ㄺ, ㄻ, ㄿ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㅁ, ㅂ]으로 발음한다.
             # <-> 단, 국어의 로마자 표기법 규정에 의해 된소리되기는 표기에 반영하지 않으므로 제외.
-            if(syllable.final or final_is_before_C):
+            if is_last_syllable or final_is_before_C:
                 if(syllable.final in ['ᆩ', 'ᆿ', 'ᆪ', 'ᆰ']):
                     syllable.final = 'ᆨ'
                 elif(syllable.final in ['ᆺ', 'ᆻ', 'ᆽ', 'ᆾ', 'ᇀ']):
@@ -57,8 +59,7 @@ class Pronouncer(object):
                     syllable.final = 'ᆯ'
                 elif(syllable.final in ['ᆱ']):
                     syllable.final = 'ᆷ'
-
-
+            
             # 4. 받침 ‘ㅎ’의 발음은 다음과 같다.
             if syllable.final in ['ᇂ', 'ᆭ', 'ᆶ']:
 
@@ -95,17 +96,19 @@ class Pronouncer(object):
                 else:
                     if (syllable.final == 'ᇂ'):
                         syllable.final = None
+
+            # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
+            # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
+            if syllable.final in double_consonant_final and next_syllable.initial == NULL_CONSONANT:
+                double_consonant = double_consonant_final[syllable.final]
+                syllable.final = double_consonant[0]
+                next_syllable.initial = next_syllable.final_to_initial(double_consonant[1])
+
             # 5. 홑받침이나 쌍받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
             # 제 음가대로 뒤 음절 첫소리로 옮겨 발음한다.
             if next_syllable and final_is_before_V:
                 if(next_syllable.initial == NULL_CONSONANT and syllable.final not in ["ᆼ", None]): # do nothing if final is ᆼ or null
                     next_syllable.initial = next_syllable.final_to_initial(syllable.final)
                     syllable.final = None
-
-            # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
-            # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
-            if syllable.final in double_consonant_final:
-                double_consonant = double_consonant_final[syllable.final]
-                syllable.final = double_consonant[0]
-                next_syllable.initial = next_syllable.final_to_initial(double_consonant[1])
+                                    
         return self._syllables
