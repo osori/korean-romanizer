@@ -1,1 +1,2 @@
 korean_romanizer==0.24
+requests>=2.26.0
