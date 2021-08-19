@@ -1,1 +1,1 @@
-korean_romanizer==0.23
+korean_romanizer==0.24
