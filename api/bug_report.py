@@ -18,7 +18,7 @@ class handler(BaseHTTPRequestHandler):
             postvars = {}
 
         src_text = postvars.get("srcText", "")
-        tgt_text = postvars.get("tgtText", ""))
+        tgt_text = postvars.get("tgtText", "")
 
         data = {
             "content" : src_text + "\n" +  tgt_text,
