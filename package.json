@@ -14,6 +14,7 @@
     "@rollup/plugin-commonjs": "^17.0.0",
     "@rollup/plugin-node-resolve": "^11.0.0",
     "@smui/button": "latest",
+    "@smui/dialog": "^4.2.0",
     "@smui/fab": "^4.2.0",
     "@smui/layout-grid": "latest",
     "@smui/paper": "^4.2.0",

@@ -5,11 +5,13 @@
   import CharacterCounter from "@smui/textfield/character-counter/index";
   import Button, { Label, Icon } from "@smui/button";
   import Paper from "@smui/paper";
+  import IssueReportDialog from "./IssueReportDialog.svelte";
 
   let inputText = "";
   let romanizedText = "";
   let isRomanizing = false;
   let isFetchingRandomSentence = false;
+  let showIssueReportDialog = false;
 
   const romanize = async () => {
     isRomanizing = true;
@@ -24,6 +26,11 @@
     inputText = await response.text();
     isFetchingRandomSentence = false;
     romanize();
+  };
+
+  const openIssueReportDialog = async () => {
+    await romanize();
+    showIssueReportDialog = true;
   };
 </script>
 
@@ -62,7 +69,7 @@
         <Button
           style="float: right;"
           color="secondary"
-          on:click={() => alert("Your issue was reported!")}
+          on:click={openIssueReportDialog}
         >
           <Icon class="material-icons">flag</Icon>
           <Label>Report an issue</Label>
@@ -104,6 +111,11 @@
   </Cell>
   <Cell spanDevices={{ desktop: 3, tablet: 1, phone: 0 }} />
 </LayoutGrid>
+<IssueReportDialog
+  bind:open={showIssueReportDialog}
+  srcText={inputText}
+  tgtText={romanizedText}
+/>
 
 <style>
   .input-container {
