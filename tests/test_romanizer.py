@@ -51,3 +51,7 @@ def test_double_consonant_final_and_next_syllable_null_initial():
 def test_non_syllables():
     assert romanize("ㅠㄴㅁㄱ") == "ㅠㄴㅁㄱ"
     assert romanize("ㅠ동") == "ㅠdong"
+
+def test_coda_h():
+    assert romanize("않습니다") == "ansseupnida"
+    assert romanize("앓고") == "alko"

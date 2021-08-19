@@ -62,22 +62,24 @@ class Pronouncer(object):
             
             # 4. 받침 ‘ㅎ’의 발음은 다음과 같다.
             if syllable.final in ['ᇂ', 'ᆭ', 'ᆶ']:
+                without_ㅎ = {
+                    'ᆭ' : 'ᆫ',
+                    'ᆶ' : 'ᆯ',
+                    'ᇂ' : None
+                }
 
                 if next_syllable:
                     # ‘ㅎ(ㄶ, ㅀ)’ 뒤에 ‘ㄱ, ㄷ, ㅈ’이 결합되는 경우에는, 뒤 음절 첫소리와 합쳐서 [ㅋ, ㅌ, ㅊ]으로 발음한다.
                     # ‘ㅎ(ㄶ, ㅀ)’ 뒤에 ‘ㅅ’이 결합되는 경우에는, ‘ㅅ’을 [ㅆ]으로 발음한다.
                     if next_syllable.initial in ['ᄀ', 'ᄃ', 'ᄌ', 'ᄉ']:
                         change_to = {'ᄀ': 'ᄏ','ᄃ': 'ᄐ','ᄌ':'ᄎ', 'ᄉ': 'ᄊ'}
-                        syllable.final = None
+                        syllable.final = without_ㅎ[syllable.final]
                         next_syllable.initial = change_to[next_syllable.initial]
                     # 3. ‘ㅎ’ 뒤에 ‘ㄴ’이 결합되는 경우에는, [ㄴ]으로 발음한다.
                     elif next_syllable.initial in ['ᄂ']:
                         # TODO: [붙임] ‘ㄶ, ㅀ’ 뒤에 ‘ㄴ’이 결합되는 경우에는, ‘ㅎ’을 발음하지 않는다.
                         if(syllable.final in ['ᆭ', 'ᆶ']):
-                            if syllable.final == 'ᆭ':
-                                syllable.final = 'ᆫ'
-                            elif syllable.final == 'ᆶ':
-                                syllable.final = 'ᆯ'
+                            syllable.final = without_ㅎ[syllable.final]
                         else:
                             syllable.final = 'ᆫ'
                     #4. ‘ㅎ(ㄶ, ㅀ)’ 뒤에 모음으로 시작된 어미나 접미사가 결합되는 경우에는,
