@@ -1,18 +1,10 @@
 from distutils.core import setup
-
-# read the contents of the README file
-from pathlib import Path
-this_directory = Path(__file__).parent
-long_description = (this_directory / "README.md").read_text()
-
 setup(
   name = 'korean_romanizer',
   packages = ['korean_romanizer'],
   version = '0.25',
   license='GNU GPLv3',
   description = 'A Python library for Korean romanization',
-  long_description=long_description,
-  long_description_content_type='text/markdown'
   author = 'Ilkyu Ju',
   author_email = 'ju.ilkyu@gmail.com',
   url = 'https://github.com/osori/korean-romanizer',
