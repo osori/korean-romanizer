@@ -101,18 +101,15 @@ class Pronouncer(object):
                         if (syllable.final == 'ᇂ'):
                             syllable.final = None
                 else:
-                    if (syllable.final == 'ᇂ'):
-                        syllable.final = None
+                    syllable.final = without_ㅎ[syllable.final]
+                        
             # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
             # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
-            if syllable.final in double_consonant_final:
-                if not next_syllable:
-                    syllable.final = double_consonant_final[syllable.final][0]
-                elif next_syllable.initial == NULL_CONSONANT:
-                    double_consonant = double_consonant_final[syllable.final]
-                    syllable.final = double_consonant[0]
-                    next_syllable.initial = next_syllable.final_to_initial(
-                        double_consonant[1])
+            if syllable.final in double_consonant_final and next_syllable.initial == NULL_CONSONANT:
+                double_consonant = double_consonant_final[syllable.final]
+                syllable.final = double_consonant[0]
+                next_syllable.initial = next_syllable.final_to_initial(
+                    double_consonant[1])
                     
             # 5. 홑받침이나 쌍받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
             # 제 음가대로 뒤 음절 첫소리로 옮겨 발음한다.
