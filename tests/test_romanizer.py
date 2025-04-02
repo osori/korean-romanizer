@@ -64,9 +64,9 @@ def test_double_consonant_final_and_next_syllable_not_null_initial():
     
 
 def test_double_consonant_final_without_next_syllable():
-    assert romanize("괜") == "gwaen"
+    assert romanize("괜찮") == "gwaenchan"
     assert romanize("뚫") == "ttul"
-    assert romanize("앉") == "an"
+    assert romanize("않") == "an"
 
 
 def test_non_syllables():
