@@ -61,6 +61,12 @@ def test_double_consonant_final_and_next_syllable_not_null_initial():
     assert romanize("앉고싶다") == "angosipda"
     assert romanize("뚫리다") == "ttulrida"
     assert romanize("칡뿌리") == "chikppuri"
+    
+
+def test_double_consonant_final_without_next_syllable():
+    assert romanize("괜찮") == "gwaenchan"
+    assert romanize("뚫") == "ttul"
+    assert romanize("않") == "an"
 
 
 def test_non_syllables():
