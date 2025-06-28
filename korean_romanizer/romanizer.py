@@ -1,6 +1,10 @@
 import re
 
-from korean_romanizer.syllable import Syllable
+from korean_romanizer.syllable import (
+    Syllable,
+    unicode_compatible_consonants,
+    unicode_initial,
+)
 from korean_romanizer.pronouncer import Pronouncer
 
 '''
@@ -96,6 +100,13 @@ coda = {
     
     None: '',
 }
+
+# Compatibility jamo (e.g. ㄱ, ㄴ) do not appear as part of a full syllable.
+# Map them to their onset romanization so single jamo can be transliterated.
+compat_onset = {
+    comp: onset[unicode_initial[i]]
+    for i, comp in enumerate(unicode_compatible_consonants)
+}
     
 class Romanizer(object):
     def __init__(self, text):
@@ -111,13 +122,14 @@ class Romanizer(object):
 
                 if not s.medial and not s.final:
                     # s is NOT a full syllable (e.g. characters)
-                    # if onset.get(chr(s.initial)):
-                    #     _romanized += onset[chr(s.initial)]
-                    # elif vowel.get(chr(s.initial)):
-                    #     _romanized += vowel[chr(s.initial)]
-                    # else:
-                    #    _romanized += char
-                    _romanized += char
+                    if char in vowel:
+                        _romanized += vowel[char]
+                    elif char in onset:
+                        _romanized += onset[char]
+                    elif char in compat_onset:
+                        _romanized += compat_onset[char]
+                    else:
+                        _romanized += char
                 else:
                     # s is a full syllable
                     _romanized += onset[s.initial] + vowel[s.medial] + coda[s.final]

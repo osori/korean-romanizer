@@ -70,8 +70,8 @@ def test_double_consonant_final_without_next_syllable():
 
 
 def test_non_syllables():
-    assert romanize("ㅠㄴㅁㄱ") == "ㅠㄴㅁㄱ"
-    assert romanize("ㅠ동") == "ㅠdong"
+    assert romanize("ㅠㄴㅁㄱ") == "yunmg"
+    assert romanize("ㅠ동") == "yudong"
 
 
 def test_coda_h():
