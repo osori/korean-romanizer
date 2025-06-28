@@ -19,3 +19,10 @@ r = Romanizer("안녕하세요")
 r.romanize() 
 # returns 'annyeonghaseyo'
 ```
+
+## Releasing
+
+Publishing to PyPI is automated using GitHub Actions. Pushing a version tag or
+creating a GitHub release triggers the workflow in
+`.github/workflows/python-publish.yml` which builds and uploads the package using
+the `PYPI_API_TOKEN` secret.
