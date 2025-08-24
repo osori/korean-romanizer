@@ -6,3 +6,5 @@ public/build/*
 MANIFEST
 dist/
 build/
+korean_romanizer.egg-info
+.vscode
