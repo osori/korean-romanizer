@@ -20,4 +20,9 @@ setup(
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
   ],
+  entry_points={
+    'console_scripts': [
+      'kroman=korean_romanizer.cli:main',
+    ],
+  },
 )
