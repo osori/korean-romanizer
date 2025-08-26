@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 from korean_romanizer.romanizer import Romanizer
@@ -34,6 +35,10 @@ def test_cli_help():
 
 def test_console_script_smoke():
     exe = shutil.which("kroman")
+    if not exe:
+        candidate = Path(sys.executable).with_name("kroman")
+        if candidate.exists():
+            exe = str(candidate)
     if not exe:
         pytest.skip("kroman console script not installed")
     env = {**os.environ, "PYTHONIOENCODING": "UTF-8"}
