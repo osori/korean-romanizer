@@ -25,4 +25,14 @@ setup(
       'kroman=korean_romanizer.cli:main',
     ],
   },
+  extras_require={
+    'dev': [
+      'build>=1.2',
+      'flake8>=7.0',
+      'mypy>=1.10',
+      'pytest>=8.0',
+      'pytest-cov>=5.0',
+      'ruff>=0.6',
+    ],
+  },
 )

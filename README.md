@@ -20,6 +20,24 @@ r.romanize()
 # returns 'annyeonghaseyo'
 ```
 
+## Development
+
+Install the local development tools with the `dev` extra:
+
+```bash
+python3 -m pip install -e ".[dev]"
+```
+
+Useful checks:
+
+```bash
+python3 -m pytest
+python3 -m pytest --cov=korean_romanizer
+ruff check .
+mypy korean_romanizer
+python3 -m build
+```
+
 ## Releasing
 
 Publishing to PyPI is automated using GitHub Actions. Pushing a version tag or
