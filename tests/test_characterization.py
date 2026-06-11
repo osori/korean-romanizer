@@ -1,5 +1,6 @@
 import pytest
 
+from korean_romanizer import romanizer, syllable, tables
 from korean_romanizer.pronouncer import Pronouncer
 from korean_romanizer.romanizer import Romanizer
 from korean_romanizer.syllable import Syllable
@@ -7,6 +8,15 @@ from korean_romanizer.syllable import Syllable
 
 def romanize(text):
     return Romanizer(text).romanize()
+
+
+def test_romanizer_table_imports_current_behavior():
+    assert romanizer.vowel is tables.vowel
+    assert romanizer.onset is tables.onset
+    assert romanizer.coda is tables.coda
+    assert romanizer.compat_onset is tables.compat_onset
+    assert romanizer.unicode_initial is syllable.unicode_initial
+    assert romanizer.unicode_compatible_consonants is syllable.unicode_compatible_consonants
 
 
 @pytest.mark.parametrize(
