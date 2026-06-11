@@ -9,7 +9,9 @@ called out in release notes.
 ## Repository Map
 
 - `korean_romanizer/romanizer.py`: public `Romanizer(text).romanize()` flow and
-  romanization tables.
+  per-character romanization flow.
+- `korean_romanizer/tables.py`: Revised Romanization vowel, onset, coda, and
+  compatibility jamo tables.
 - `korean_romanizer/pronouncer.py`: context-sensitive pronunciation
   substitutions before romanization.
 - `korean_romanizer/syllable.py`: Hangul syllable decomposition and
@@ -41,6 +43,11 @@ Set up a local development checkout:
 - Prefer small PRs with one purpose.
 - For rule changes, add a focused test fixture and a short comment or reference
   explaining the Korean pronunciation or romanization rule being implemented.
+- For correctness changes, validate expected output against the National
+  Institute of Korean Language Romanization of Korean rules:
+  `https://www.korean.go.kr/front_eng/roman/roman_01.do`.
+- Keep RR-correctness fixtures distinct from characterization tests that only
+  preserve today's behavior.
 - Treat `Syllable`, `Pronouncer`, and module-level tables as compatibility risks
   until the public API surface is explicitly narrowed or documented.
 - Preserve mixed non-Korean text and punctuation behavior unless changing it is
