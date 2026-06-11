@@ -16,6 +16,11 @@ double_consonant_final = {
 }
 
 NULL_CONSONANT = 'ᄋ'
+INITIAL_N = 'ᄂ'
+INITIAL_RIEUL = 'ᄅ'
+FINAL_N = 'ᆫ'
+FINAL_NG = 'ᆼ'
+FINAL_RIEUL = 'ᆯ'
 
 
 class Pronouncer(object):
@@ -110,6 +115,22 @@ class Pronouncer(object):
                 syllable.final = double_consonant[0]
                 next_syllable.initial = next_syllable.final_to_initial(
                     double_consonant[1])
+
+            # Revised Romanization follows pronounced forms for adjacent liquids
+            # and nasals, e.g. 종로[종노], 신라[실라], 별내[별래].
+            if next_syllable:
+                if syllable.final == FINAL_NG and next_syllable.initial == INITIAL_RIEUL:
+                    next_syllable.initial = INITIAL_N
+                elif (
+                    syllable.final == FINAL_N
+                    and next_syllable.initial == INITIAL_RIEUL
+                    # 신문로[신문노] needs morphology-aware handling; leave
+                    # 로-suffix cases out of this narrow liquidization rule.
+                    and next_syllable.char != '로'
+                ):
+                    syllable.final = FINAL_RIEUL
+                elif syllable.final == FINAL_RIEUL and next_syllable.initial == INITIAL_N:
+                    next_syllable.initial = INITIAL_RIEUL
                     
             # 5. 홑받침이나 쌍받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
             # 제 음가대로 뒤 음절 첫소리로 옮겨 발음한다.

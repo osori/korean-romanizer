@@ -47,10 +47,7 @@ def test_jamo_current_behavior(text, expected):
     ("text", "expected"),
     [
         ("같이", "gati"),
-        ("종로", "jongro"),
-        ("신라", "sinra"),
-        ("울릉", "ulreung"),
-        ("대관령", "daegwanryeong"),
+        ("신문로", "sinmunro"),
     ],
 )
 def test_known_rr_edge_cases_current_behavior(text, expected):
