@@ -1,5 +1,3 @@
-import re
-
 from korean_romanizer.syllable import (
     Syllable,
     unicode_compatible_consonants,
@@ -107,34 +105,43 @@ compat_onset = {
     comp: onset[unicode_initial[i]]
     for i, comp in enumerate(unicode_compatible_consonants)
 }
-    
+
+
+def _is_romanizable_hangul(char):
+    return '가' <= char <= '힣' or 'ㄱ' <= char <= 'ㅣ'
+
+
+def _romanize_non_syllable(char):
+    if char in vowel:
+        return vowel[char]
+    elif char in onset:
+        return onset[char]
+    elif char in compat_onset:
+        return compat_onset[char]
+    else:
+        return char
+
+
+def _romanize_syllable(char):
+    syllable = Syllable(char)
+
+    if not syllable.medial and not syllable.final:
+        return _romanize_non_syllable(char)
+
+    return onset[syllable.initial] + vowel[syllable.medial] + coda[syllable.final]
+
+
 class Romanizer(object):
     def __init__(self, text):
         self.text = text
 
     def romanize(self):
         pronounced = Pronouncer(self.text).pronounced
-        hangul = r"[가-힣ㄱ-ㅣ]"
-        _romanized = ""
+        romanized = []
         for char in pronounced:
-            if (re.match(hangul, char)):
-                s = Syllable(char)
-
-                if not s.medial and not s.final:
-                    # s is NOT a full syllable (e.g. characters)
-                    if char in vowel:
-                        _romanized += vowel[char]
-                    elif char in onset:
-                        _romanized += onset[char]
-                    elif char in compat_onset:
-                        _romanized += compat_onset[char]
-                    else:
-                        _romanized += char
-                else:
-                    # s is a full syllable
-                    _romanized += onset[s.initial] + vowel[s.medial] + coda[s.final]
-
+            if _is_romanizable_hangul(char):
+                romanized.append(_romanize_syllable(char))
             else:
-                _romanized += char
+                romanized.append(char)
 
-        return _romanized
+        return ''.join(romanized)
