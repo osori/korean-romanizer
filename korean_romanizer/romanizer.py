@@ -1,4 +1,8 @@
-from korean_romanizer.syllable import Syllable
+from korean_romanizer.syllable import (
+    Syllable,
+    unicode_compatible_consonants,
+    unicode_initial,
+)
 from korean_romanizer.pronouncer import Pronouncer
 from korean_romanizer.tables import coda, compat_onset, onset, vowel
 
