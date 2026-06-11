@@ -20,16 +20,15 @@ called out in release notes.
 
 ## Commands
 
-Current baseline:
+Set up a local development checkout:
+
+- Install dev tooling: `python3 -m pip install -e ".[dev]"`
 
 - Run tests: `python3 -m pytest`
 - Run CLI smoke test: `python3 -m korean_romanizer.cli 안녕하세요`
-
-After development tooling is added:
-
 - Run coverage: `python3 -m pytest --cov=korean_romanizer`
 - Run linting: `ruff check .`
-- Run formatting: `ruff format .`
+- Format code only in a dedicated formatting PR: `ruff format .`
 - Run type checks: `mypy korean_romanizer`
 - Build package: `python3 -m build`
 
