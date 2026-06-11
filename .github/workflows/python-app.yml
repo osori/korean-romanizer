@@ -1,4 +1,5 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# This workflow installs development dependencies, runs the test matrix, and
+# checks the repository quality gates.
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Python application
@@ -13,26 +14,48 @@ permissions:
   contents: read
 
 jobs:
-  build:
+  test:
+    name: Test Python ${{ matrix.python-version }}
 
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: ${{ matrix.python-version }}
+        cache: pip
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install -e ".[dev]"
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        python -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        python -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
+      run: python -m pytest
+
+  quality:
+    name: Quality gates
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
+        cache: pip
+    - name: Install dependencies
       run: |
-        python -m pytest
+        python -m pip install --upgrade pip
+        python -m pip install -e ".[dev]"
+    - name: Lint with ruff
+      run: python -m ruff check .
+    - name: Type check with mypy
+      run: python -m mypy korean_romanizer
+    - name: Build package
+      run: python -m build
