@@ -66,14 +66,9 @@ Current tests:
   available.
 - CI installs the package with `pip install .`, runs a limited `flake8` check,
   then runs `pytest` on Python 3.10.
-- Local baseline: after bootstrapping temporary test dependencies under `/tmp`,
-  `python3 -m pytest -q` on Python 3.12.3 reports `19 passed, 1 skipped`.
 
 Observed test gaps:
 
-- The local environment initially had Python 3.12, but no `pytest`, `pip`, or
-  `python3.12-venv`, so there is no straightforward project-owned local test
-  bootstrap path.
 - Tests focus on `Romanizer`; `Syllable` and `Pronouncer` internals have no
   direct unit tests despite carrying most rule complexity.
 - There is no golden corpus from the official Revised Romanization rules or from
@@ -144,6 +139,11 @@ Packaging and release gaps:
 - The algorithm has no morphology or word-boundary model. Some Korean
   romanization rules depend on morpheme boundaries, proper nouns, names, or
   conventional spellings, which a pure character-neighborhood pass cannot infer.
+- Proper nouns should probably not be handled by hidden guesses in the core
+  transliterator. A safer approach is an optional override layer: keep the
+  default algorithm deterministic, then allow callers or a curated data file to
+  supply accepted spellings for names, places, and brand terms. That keeps
+  conventional forms explicit, testable, and separable from phonological rules.
 - `Pronouncer.final_substitute` mutates adjacent syllables in place and depends
   on rule order. Adding rules without characterization tests could silently
   change earlier behavior.
@@ -335,3 +335,22 @@ Validation:
   production PyPI release process.
 - Confirm `setuptools_scm` produces the intended version for tags and release
   builds.
+
+### PR 11: Prepare a v1.0.x Release
+
+Scope:
+
+- Decide the minimum public API and behavior guarantees for the first stable
+  release.
+- Review any remaining known correctness gaps and either fix them, document
+  them, or mark them as explicitly out of scope for 1.0.
+- Freeze the compatibility policy for `Romanizer`, `kroman`, and any supported
+  lower-level imports.
+- Cut the first `v1.0.x` release only after CI, packaging, and release automation
+  are reliable.
+
+Validation:
+
+- Run the full supported Python matrix.
+- Build and inspect release artifacts.
+- Publish through the hardened release workflow.
