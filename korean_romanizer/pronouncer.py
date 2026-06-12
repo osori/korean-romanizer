@@ -22,9 +22,47 @@ FINAL_N = 'ᆫ'
 FINAL_NG = 'ᆼ'
 FINAL_RIEUL = 'ᆯ'
 
+# Standard Pronunciation Rule Article 20 exceptions where ㄴ+ㄹ is pronounced
+# ㄴ+ㄴ, not ㄹ+ㄹ. 신문로 is an official RR adjacent-assimilation example.
+N_R_TO_N_BOUNDARY_WORDS = (
+    '의견란',
+    '임진란',
+    '생산량',
+    '결단력',
+    '공권력',
+    '동원령',
+    '상견례',
+    '횡단로',
+    '이원론',
+    '입원료',
+    '구근류',
+    '신문로',
+)
+
+
+def _find_n_r_to_n_boundaries(text):
+    boundaries = set()
+
+    for word in N_R_TO_N_BOUNDARY_WORDS:
+        start = text.find(word)
+        while start != -1:
+            for offset in range(len(word) - 1):
+                syllable = Syllable(word[offset])
+                next_syllable = Syllable(word[offset + 1])
+                if (
+                    syllable.final == FINAL_N
+                    and next_syllable.initial == INITIAL_RIEUL
+                ):
+                    boundaries.add(start + offset)
+
+            start = text.find(word, start + 1)
+
+    return boundaries
+
 
 class Pronouncer(object):
     def __init__(self, text):
+        self._n_r_to_n_boundaries = _find_n_r_to_n_boundaries(text)
         self._syllables = [Syllable(char) for char in text]
         self.pronounced = ''.join([str(c) for c in self.final_substitute()])
 
@@ -124,11 +162,11 @@ class Pronouncer(object):
                 elif (
                     syllable.final == FINAL_N
                     and next_syllable.initial == INITIAL_RIEUL
-                    # 신문로[신문노] needs morphology-aware handling; leave
-                    # 로-suffix cases out of this narrow liquidization rule.
-                    and next_syllable.char != '로'
                 ):
-                    syllable.final = FINAL_RIEUL
+                    if idx in self._n_r_to_n_boundaries:
+                        next_syllable.initial = INITIAL_N
+                    else:
+                        syllable.final = FINAL_RIEUL
                 elif syllable.final == FINAL_RIEUL and next_syllable.initial == INITIAL_N:
                     next_syllable.initial = INITIAL_RIEUL
                     
