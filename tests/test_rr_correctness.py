@@ -56,6 +56,26 @@ def test_n_r_to_n_exception_rr_correctness(text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("강릉", "gangneung"),
+        ("담력", "damnyeok"),
+        ("막론", "mangnon"),
+        ("석류", "seongnyu"),
+        ("협력", "hyeomnyeok"),
+        ("법리", "beomni"),
+        ("십리", "simni"),
+        ("왕십리", "wangsimni"),
+    ],
+)
+def test_rieul_to_n_after_nasal_and_stop_codas_rr_correctness(text, expected):
+    # Standard Pronunciation Rule Article 19 changes ㄹ to ㄴ after
+    # ㄱ/ㅁ/ㅂ/ㅇ; ㄱ and ㅂ nasalize before that resulting ㄴ.
+    # Official RR includes 왕십리[왕심니].
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("난로", "날로"),
         ("종로", "종노"),
         ("신라", "실라"),
@@ -91,4 +111,21 @@ def test_liquid_and_nasal_assimilation_pronunciation(text, expected):
 def test_n_r_to_n_exception_pronunciation(text, expected):
     # This project intentionally avoids RR-irrelevant tensification, so these
     # expected pronunciations focus on the ㄹ-to-ㄴ boundary change.
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("강릉", "강능"),
+        ("담력", "담녁"),
+        ("막론", "망논"),
+        ("석류", "성뉴"),
+        ("협력", "혐녁"),
+        ("법리", "범니"),
+        ("십리", "심니"),
+        ("왕십리", "왕심니"),
+    ],
+)
+def test_rieul_to_n_after_nasal_and_stop_codas_pronunciation(text, expected):
     assert Pronouncer(text).pronounced == expected

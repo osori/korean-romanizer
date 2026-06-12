@@ -18,9 +18,21 @@ double_consonant_final = {
 NULL_CONSONANT = 'ᄋ'
 INITIAL_N = 'ᄂ'
 INITIAL_RIEUL = 'ᄅ'
+FINAL_K = 'ᆨ'
+FINAL_M = 'ᆷ'
 FINAL_N = 'ᆫ'
 FINAL_NG = 'ᆼ'
+FINAL_P = 'ᆸ'
 FINAL_RIEUL = 'ᆯ'
+
+# Standard Pronunciation Rule Article 19: initial ㄹ is pronounced ㄴ after
+# ㄱ, ㅁ, ㅂ, and ㅇ; ㄱ and ㅂ also nasalize before the resulting ㄴ.
+FINAL_BEFORE_RIEUL_TO_PRONOUNCED_FINAL = {
+    FINAL_K: FINAL_NG,
+    FINAL_M: FINAL_M,
+    FINAL_NG: FINAL_NG,
+    FINAL_P: FINAL_M,
+}
 
 # Standard Pronunciation Rule Article 20 exceptions where ㄴ+ㄹ is pronounced
 # ㄴ+ㄴ, not ㄹ+ㄹ. 신문로 is an official RR adjacent-assimilation example.
@@ -155,19 +167,24 @@ class Pronouncer(object):
                     double_consonant[1])
 
             # Revised Romanization follows pronounced forms for adjacent liquids
-            # and nasals, e.g. 종로[종노], 신라[실라], 별내[별래].
+            # and nasals, e.g. 종로[종노], 왕십리[왕심니], 신라[실라],
+            # 별내[별래].
             if next_syllable:
-                if syllable.final == FINAL_NG and next_syllable.initial == INITIAL_RIEUL:
-                    next_syllable.initial = INITIAL_N
-                elif (
-                    syllable.final == FINAL_N
-                    and next_syllable.initial == INITIAL_RIEUL
-                ):
-                    if idx in self._n_r_to_n_boundaries:
+                if next_syllable.initial == INITIAL_RIEUL:
+                    pronounced_final = FINAL_BEFORE_RIEUL_TO_PRONOUNCED_FINAL.get(
+                        syllable.final)
+                    if pronounced_final:
+                        syllable.final = pronounced_final
                         next_syllable.initial = INITIAL_N
-                    else:
-                        syllable.final = FINAL_RIEUL
-                elif syllable.final == FINAL_RIEUL and next_syllable.initial == INITIAL_N:
+                    elif syllable.final == FINAL_N:
+                        if idx in self._n_r_to_n_boundaries:
+                            next_syllable.initial = INITIAL_N
+                        else:
+                            syllable.final = FINAL_RIEUL
+                elif (
+                    syllable.final == FINAL_RIEUL
+                    and next_syllable.initial == INITIAL_N
+                ):
                     next_syllable.initial = INITIAL_RIEUL
                     
             # 5. 홑받침이나 쌍받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
