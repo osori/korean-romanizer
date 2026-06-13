@@ -11,12 +11,15 @@ def romanize(text):
 
 
 def test_romanizer_table_imports_current_behavior():
-    assert romanizer.vowel is tables.vowel
-    assert romanizer.onset is tables.onset
-    assert romanizer.coda is tables.coda
-    assert romanizer.compat_onset is tables.compat_onset
-    assert romanizer.unicode_initial is syllable.unicode_initial
-    assert romanizer.unicode_compatible_consonants is syllable.unicode_compatible_consonants
+    # After refactoring, romanizer imports from tables directly (no re-exports).
+    # Verify the tables module exposes both new UPPERCASE and backward-compat names.
+    assert tables.VOWEL_ROMANIZATION is tables.vowel
+    assert tables.ONSET_ROMANIZATION is tables.onset
+    assert tables.CODA_ROMANIZATION is tables.coda
+    assert tables.COMPAT_ONSET_ROMANIZATION is tables.compat_onset
+    # Unicode data moved from syllable.py to tables.py
+    assert tables.unicode_initial is syllable.unicode_initial
+    assert tables.unicode_compatible_consonants is syllable.unicode_compatible_consonants
 
 
 @pytest.mark.parametrize(
