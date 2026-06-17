@@ -16,14 +16,31 @@ double_consonant_final = {
 }
 
 NULL_CONSONANT = 'ᄋ'
+INITIAL_CH = 'ᄎ'
+INITIAL_H = 'ᄒ'
+INITIAL_J = 'ᄌ'
 INITIAL_N = 'ᄂ'
 INITIAL_RIEUL = 'ᄅ'
+FINAL_D = 'ᆮ'
 FINAL_K = 'ᆨ'
 FINAL_M = 'ᆷ'
 FINAL_N = 'ᆫ'
 FINAL_NG = 'ᆼ'
 FINAL_P = 'ᆸ'
 FINAL_RIEUL = 'ᆯ'
+FINAL_RIEUL_T = 'ᆴ'
+FINAL_T = 'ᇀ'
+MEDIAL_I = 'ㅣ'
+
+PALATALIZED_BEFORE_I_BY_FINAL = {
+    FINAL_D: (None, INITIAL_J),
+    FINAL_T: (None, INITIAL_CH),
+    FINAL_RIEUL_T: (FINAL_RIEUL, INITIAL_CH),
+}
+
+PALATALIZED_BEFORE_HI_BY_FINAL = {
+    FINAL_D: (None, INITIAL_CH),
+}
 
 # Standard Pronunciation Rule Article 19: initial ㄹ is pronounced ㄴ after
 # ㄱ, ㅁ, ㅂ, and ㅇ; ㄱ and ㅂ also nasalize before the resulting ㄴ.
@@ -60,6 +77,23 @@ N_R_TO_N_BOUNDARY_WORDS = (
     '신문로',
 )
 
+# Standard Pronunciation Rule Article 17 applies ㄷ/ㅌ palatalization before
+# the vowel ㅣ only in particle/suffix contexts. Keep this list source-backed
+# instead of applying a context-free ㄷ/ㅌ + 이 rule.
+PALATALIZATION_BOUNDARY_WORDS = (
+    '해돋이',
+    '같이',
+    '굳히다',
+    '곧이듣다',
+    '굳이',
+    '미닫이',
+    '땀받이',
+    '밭이',
+    '벼훑이',
+    '닫히다',
+    '묻히다',
+)
+
 
 def _find_n_r_to_n_boundaries(text):
     boundaries = set()
@@ -81,6 +115,35 @@ def _find_n_r_to_n_boundaries(text):
     return boundaries
 
 
+def _find_palatalization_boundaries(text):
+    boundaries = set()
+
+    for word in PALATALIZATION_BOUNDARY_WORDS:
+        start = text.find(word)
+        while start != -1:
+            for offset in range(len(word) - 1):
+                syllable = Syllable(word[offset])
+                next_syllable = Syllable(word[offset + 1])
+
+                if next_syllable.medial != MEDIAL_I:
+                    continue
+
+                if (
+                    next_syllable.initial == NULL_CONSONANT
+                    and syllable.final in PALATALIZED_BEFORE_I_BY_FINAL
+                ):
+                    boundaries.add(start + offset)
+                elif (
+                    next_syllable.initial == INITIAL_H
+                    and syllable.final in PALATALIZED_BEFORE_HI_BY_FINAL
+                ):
+                    boundaries.add(start + offset)
+
+            start = text.find(word, start + 1)
+
+    return boundaries
+
+
 def _find_rieul_assimilation_preserved_boundaries(text):
     boundaries = set()
 
@@ -93,9 +156,25 @@ def _find_rieul_assimilation_preserved_boundaries(text):
     return boundaries
 
 
+def _apply_palatalization(syllable, next_syllable):
+    if next_syllable.medial != MEDIAL_I:
+        return
+
+    if next_syllable.initial == NULL_CONSONANT:
+        replacement = PALATALIZED_BEFORE_I_BY_FINAL.get(syllable.final)
+    elif next_syllable.initial == INITIAL_H:
+        replacement = PALATALIZED_BEFORE_HI_BY_FINAL.get(syllable.final)
+    else:
+        replacement = None
+
+    if replacement:
+        syllable.final, next_syllable.initial = replacement
+
+
 class Pronouncer(object):
     def __init__(self, text):
         self._n_r_to_n_boundaries = _find_n_r_to_n_boundaries(text)
+        self._palatalization_boundaries = _find_palatalization_boundaries(text)
         self._rieul_assimilation_preserved_boundaries = (
             _find_rieul_assimilation_preserved_boundaries(text))
         self._syllables = [Syllable(char) for char in text]
@@ -181,6 +260,11 @@ class Pronouncer(object):
                 else:
                     syllable.final = without_ㅎ[syllable.final]
                         
+            # Revised Romanization follows pronounced palatalization, e.g.
+            # 해돋이[해도지], 같이[가치], 굳히다[구치다].
+            if next_syllable and idx in self._palatalization_boundaries:
+                _apply_palatalization(syllable, next_syllable)
+
             # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
             # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
             if syllable.final in double_consonant_final and next_syllable.initial == NULL_CONSONANT:

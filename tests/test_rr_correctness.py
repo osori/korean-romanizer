@@ -83,6 +83,29 @@ def test_administrative_unit_ri_preserves_rr_spelling():
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("해돋이", "haedoji"),
+        ("같이", "gachi"),
+        ("굳히다", "guchida"),
+        ("굳이", "guji"),
+        ("밭이", "bachi"),
+        ("벼훑이", "byeohulchi"),
+    ],
+)
+def test_palatalization_rr_correctness(text, expected):
+    # Official NIKL RR examples include 해돋이[해도지],
+    # 같이[가치], and 굳히다[구치다].
+    # See https://www.korean.go.kr/front_eng/roman/roman_01.do.
+    assert romanize(text) == expected
+
+
+def test_palatalization_does_not_apply_to_lexical_ieo():
+    assert Pronouncer("곧이어").pronounced == "고디어"
+    assert romanize("곧이어") == "godieo"
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("난로", "날로"),
         ("종로", "종노"),
         ("신라", "실라"),
@@ -135,4 +158,19 @@ def test_n_r_to_n_exception_pronunciation(text, expected):
     ],
 )
 def test_rieul_to_n_after_nasal_and_stop_codas_pronunciation(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("해돋이", "해도지"),
+        ("같이", "가치"),
+        ("굳히다", "구치다"),
+        ("굳이", "구지"),
+        ("밭이", "바치"),
+        ("벼훑이", "벼훌치"),
+    ],
+)
+def test_palatalization_pronunciation(text, expected):
     assert Pronouncer(text).pronounced == expected
