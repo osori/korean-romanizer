@@ -59,7 +59,7 @@ def test_double_consonant_final_and_next_syllable_null_initial():
 
 def test_double_consonant_final_and_next_syllable_not_null_initial():
     assert romanize("앉고싶다") == "angosipda"
-    assert romanize("뚫리다") == "ttulrida"
+    assert romanize("뚫리다") == "ttullida"
     assert romanize("칡뿌리") == "chikppuri"
     
 
