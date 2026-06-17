@@ -73,6 +73,13 @@ def test_rieul_to_n_after_nasal_and_stop_codas_rr_correctness(text, expected):
     assert romanize(text) == expected
 
 
+def test_administrative_unit_ri_preserves_rr_spelling():
+    # Official RR is Inwang-ri. This project currently omits proper-name
+    # capitalization and administrative-unit hyphenation, so assert inwangri.
+    assert romanize("인왕리") == "inwangri"
+    assert romanize("왕십리") == "wangsimni"
+
+
 @pytest.mark.parametrize(
     ("text", "expected"),
     [

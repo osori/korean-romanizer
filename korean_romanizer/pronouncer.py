@@ -34,6 +34,15 @@ FINAL_BEFORE_RIEUL_TO_PRONOUNCED_FINAL = {
     FINAL_P: FINAL_M,
 }
 
+# RR Special Provision 5 preserves administrative units such as 리 as "ri";
+# assimilated sound changes before or after that boundary are not transcribed.
+# This project does not yet emit proper-name capitalization or admin-unit
+# hyphens, so this table only protects source-backed examples in the current
+# lowercase/no-hyphen style.
+RR_ADMIN_UNIT_RI_WORDS = (
+    '인왕리',
+)
+
 # Standard Pronunciation Rule Article 20 exceptions where ㄴ+ㄹ is pronounced
 # ㄴ+ㄴ, not ㄹ+ㄹ. 신문로 is an official RR adjacent-assimilation example.
 N_R_TO_N_BOUNDARY_WORDS = (
@@ -72,9 +81,23 @@ def _find_n_r_to_n_boundaries(text):
     return boundaries
 
 
+def _find_rieul_assimilation_preserved_boundaries(text):
+    boundaries = set()
+
+    for word in RR_ADMIN_UNIT_RI_WORDS:
+        start = text.find(word)
+        while start != -1:
+            boundaries.add(start + len(word) - 2)
+            start = text.find(word, start + 1)
+
+    return boundaries
+
+
 class Pronouncer(object):
     def __init__(self, text):
         self._n_r_to_n_boundaries = _find_n_r_to_n_boundaries(text)
+        self._rieul_assimilation_preserved_boundaries = (
+            _find_rieul_assimilation_preserved_boundaries(text))
         self._syllables = [Syllable(char) for char in text]
         self.pronounced = ''.join([str(c) for c in self.final_substitute()])
 
@@ -170,7 +193,10 @@ class Pronouncer(object):
             # and nasals, e.g. 종로[종노], 왕십리[왕심니], 신라[실라],
             # 별내[별래].
             if next_syllable:
-                if next_syllable.initial == INITIAL_RIEUL:
+                if (
+                    next_syllable.initial == INITIAL_RIEUL
+                    and idx not in self._rieul_assimilation_preserved_boundaries
+                ):
                     pronounced_final = FINAL_BEFORE_RIEUL_TO_PRONOUNCED_FINAL.get(
                         syllable.final)
                     if pronounced_final:

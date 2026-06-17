@@ -139,6 +139,13 @@ Packaging and release gaps:
 - The algorithm has no morphology or word-boundary model. Some Korean
   romanization rules depend on morpheme boundaries, proper nouns, names, or
   conventional spellings, which a pure character-neighborhood pass cannot infer.
+- Revised Romanization also has transcription special provisions that are not
+  pure pronunciation rules. For example, `왕십리[왕심니] Wangsimni` follows
+  pronounced assimilation, while administrative-unit examples such as
+  `인왕리 Inwang-ri` preserve the `리` spelling and do not transcribe sound
+  changes around the administrative-unit boundary. The current implementation
+  should treat source-backed examples as guarded compatibility data until a
+  dedicated proper-name/admin-unit layer exists.
 - Proper nouns should probably not be handled by hidden guesses in the core
   transliterator. A safer approach is an optional override layer: keep the
   default algorithm deterministic, then allow callers or a curated data file to
@@ -281,6 +288,10 @@ Scope:
   - nasal and liquid assimilation such as `종로`, `신라`, `울릉`, and `대관령`;
   - remaining double-final and `ㅎ` edge cases.
 - Back each rule family with official examples or a checked golden corpus.
+- Keep standard-pronunciation fixes separate from RR special provisions for
+  proper names and administrative units. Add source-backed examples first, then
+  move toward an explicit override or boundary model instead of broad suffix
+  heuristics.
 - Mark behavior-changing releases clearly.
 
 Validation:
