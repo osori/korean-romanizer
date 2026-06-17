@@ -16,14 +16,25 @@ double_consonant_final = {
 }
 
 NULL_CONSONANT = 'ᄋ'
+INITIAL_CH = 'ᄎ'
+INITIAL_H = 'ᄒ'
+INITIAL_J = 'ᄌ'
 INITIAL_N = 'ᄂ'
 INITIAL_RIEUL = 'ᄅ'
+FINAL_D = 'ᆮ'
 FINAL_K = 'ᆨ'
 FINAL_M = 'ᆷ'
 FINAL_N = 'ᆫ'
 FINAL_NG = 'ᆼ'
 FINAL_P = 'ᆸ'
 FINAL_RIEUL = 'ᆯ'
+FINAL_T = 'ᇀ'
+MEDIAL_I = 'ㅣ'
+
+PALATALIZED_INITIAL_BY_FINAL = {
+    FINAL_D: INITIAL_J,
+    FINAL_T: INITIAL_CH,
+}
 
 # Standard Pronunciation Rule Article 19: initial ㄹ is pronounced ㄴ after
 # ㄱ, ㅁ, ㅂ, and ㅇ; ㄱ and ㅂ also nasalize before the resulting ㄴ.
@@ -91,6 +102,23 @@ def _find_rieul_assimilation_preserved_boundaries(text):
             start = text.find(word, start + 1)
 
     return boundaries
+
+
+def _apply_palatalization(syllable, next_syllable):
+    if next_syllable.medial != MEDIAL_I:
+        return
+
+    if next_syllable.initial == NULL_CONSONANT:
+        palatalized_initial = PALATALIZED_INITIAL_BY_FINAL.get(syllable.final)
+        if palatalized_initial:
+            syllable.final = None
+            next_syllable.initial = palatalized_initial
+    elif (
+        next_syllable.initial == INITIAL_H
+        and syllable.final in PALATALIZED_INITIAL_BY_FINAL
+    ):
+        syllable.final = None
+        next_syllable.initial = INITIAL_CH
 
 
 class Pronouncer(object):
@@ -188,6 +216,11 @@ class Pronouncer(object):
                 syllable.final = double_consonant[0]
                 next_syllable.initial = next_syllable.final_to_initial(
                     double_consonant[1])
+
+            # Revised Romanization follows pronounced palatalization, e.g.
+            # 해돋이[해도지], 같이[가치], 굳히다[구치다].
+            if next_syllable:
+                _apply_palatalization(syllable, next_syllable)
 
             # Revised Romanization follows pronounced forms for adjacent liquids
             # and nasals, e.g. 종로[종노], 왕십리[왕심니], 신라[실라],

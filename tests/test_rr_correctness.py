@@ -83,6 +83,21 @@ def test_administrative_unit_ri_preserves_rr_spelling():
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("해돋이", "haedoji"),
+        ("같이", "gachi"),
+        ("굳히다", "guchida"),
+    ],
+)
+def test_palatalization_rr_correctness(text, expected):
+    # Official NIKL RR examples include 해돋이[해도지],
+    # 같이[가치], and 굳히다[구치다].
+    # See https://www.korean.go.kr/front_eng/roman/roman_01.do.
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("난로", "날로"),
         ("종로", "종노"),
         ("신라", "실라"),
@@ -135,4 +150,16 @@ def test_n_r_to_n_exception_pronunciation(text, expected):
     ],
 )
 def test_rieul_to_n_after_nasal_and_stop_codas_pronunciation(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("해돋이", "해도지"),
+        ("같이", "가치"),
+        ("굳히다", "구치다"),
+    ],
+)
+def test_palatalization_pronunciation(text, expected):
     assert Pronouncer(text).pronounced == expected

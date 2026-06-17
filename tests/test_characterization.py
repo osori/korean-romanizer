@@ -46,17 +46,6 @@ def test_jamo_current_behavior(text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
-        ("같이", "gati"),
-    ],
-)
-def test_known_rr_edge_cases_current_behavior(text, expected):
-    # These fixtures lock today's output; they are not claims of RR correctness.
-    assert romanize(text) == expected
-
-
-@pytest.mark.parametrize(
-    ("text", "expected"),
-    [
         ("좋습니다", "josseupnida"),
         ("놓고", "noko"),
         ("닿지", "dachi"),
@@ -79,7 +68,6 @@ def test_final_consonant_rules_current_behavior(text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
-        ("같이", "가티"),
         ("좋습니다", "조씁니다"),
         ("낳은", "나은"),
         ("싫어", "시러"),

@@ -127,11 +127,12 @@ Packaging and release gaps:
 
 ## Likely Correctness Risks
 
-- The implementation does not cover all Revised Romanization edge cases. Direct
-  checks show outputs such as `같이 -> gati`, `종로 -> jongro`,
-  `신라 -> sinra`, `울릉 -> ulreung`, and `대관령 -> daegwanryeong`; several of
-  these are known assimilation or palatalization cases that likely need explicit
-  rules.
+- The implementation does not cover all Revised Romanization edge cases. Earlier
+  checks found known assimilation and palatalization gaps such as
+  `같이 -> gati`, `종로 -> jongro`, `신라 -> sinra`, `울릉 -> ulreung`, and
+  `대관령 -> daegwanryeong`. The liquid/nasal cases have since been moved into
+  RR correctness coverage; remaining rule families should continue to be fixed
+  in small, source-backed PRs.
 - Decomposed modern jamo are not consistently romanized. For example, `ᄀ` is
   currently preserved because the romanizer's Hangul regex covers precomposed
   Hangul and compatibility jamo, but not the modern choseong/jongseong Unicode
