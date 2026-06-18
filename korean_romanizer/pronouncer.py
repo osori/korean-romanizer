@@ -20,6 +20,7 @@ INITIAL_CH = 'ᄎ'
 INITIAL_H = 'ᄒ'
 INITIAL_J = 'ᄌ'
 INITIAL_N = 'ᄂ'
+INITIAL_P = 'ᄑ'
 INITIAL_RIEUL = 'ᄅ'
 FINAL_D = 'ᆮ'
 FINAL_K = 'ᆨ'
@@ -31,6 +32,7 @@ FINAL_RIEUL = 'ᆯ'
 FINAL_RIEUL_T = 'ᆴ'
 FINAL_T = 'ᇀ'
 MEDIAL_I = 'ㅣ'
+MEDIAL_YEO = 'ㅕ'
 
 PALATALIZED_BEFORE_I_BY_FINAL = {
     FINAL_D: (None, INITIAL_J),
@@ -40,6 +42,10 @@ PALATALIZED_BEFORE_I_BY_FINAL = {
 
 PALATALIZED_BEFORE_HI_BY_FINAL = {
     FINAL_D: (None, INITIAL_CH),
+}
+
+ASPIRATED_BEFORE_H_BY_FINAL = {
+    FINAL_P: INITIAL_P,
 }
 
 # Standard Pronunciation Rule Article 19: initial ㄹ is pronounced ㄴ after
@@ -94,6 +100,16 @@ PALATALIZATION_BOUNDARY_WORDS = (
     '묻히다',
 )
 
+# RR transcribes pronounced aspiration around ㅎ for source-backed examples such
+# as 잡혀[자펴]. The same 잡- + -히/-혀- boundary appears in inflected forms
+# such as 잡힌, 잡히다, 잡혔다, and 잡혔어.
+#
+# Keep this explicit instead of applying every ㄱ/ㄷ/ㅂ+ㅎ boundary, because RR
+# does not transcribe the aspirated sound in noun examples such as 묵호 and 집현전.
+H_ASPIRATION_BOUNDARY_PATTERNS = (
+    ('잡', (MEDIAL_I, MEDIAL_YEO)),
+)
+
 
 def _find_n_r_to_n_boundaries(text):
     boundaries = set()
@@ -111,6 +127,27 @@ def _find_n_r_to_n_boundaries(text):
                     boundaries.add(start + offset)
 
             start = text.find(word, start + 1)
+
+    return boundaries
+
+
+def _find_h_aspiration_boundaries(text):
+    boundaries = set()
+
+    for idx in range(len(text) - 1):
+        for stem_syllable, next_medials in H_ASPIRATION_BOUNDARY_PATTERNS:
+            if text[idx] != stem_syllable:
+                continue
+
+            syllable = Syllable(text[idx])
+            next_syllable = Syllable(text[idx + 1])
+            if (
+                syllable.final in ASPIRATED_BEFORE_H_BY_FINAL
+                and next_syllable.initial == INITIAL_H
+                and next_syllable.medial in next_medials
+            ):
+                boundaries.add(idx)
+                break
 
     return boundaries
 
@@ -171,8 +208,16 @@ def _apply_palatalization(syllable, next_syllable):
         syllable.final, next_syllable.initial = replacement
 
 
+def _apply_h_aspiration(syllable, next_syllable):
+    aspirated_initial = ASPIRATED_BEFORE_H_BY_FINAL.get(syllable.final)
+    if aspirated_initial and next_syllable.initial == INITIAL_H:
+        syllable.final = None
+        next_syllable.initial = aspirated_initial
+
+
 class Pronouncer(object):
     def __init__(self, text):
+        self._h_aspiration_boundaries = _find_h_aspiration_boundaries(text)
         self._n_r_to_n_boundaries = _find_n_r_to_n_boundaries(text)
         self._palatalization_boundaries = _find_palatalization_boundaries(text)
         self._rieul_assimilation_preserved_boundaries = (
@@ -260,6 +305,11 @@ class Pronouncer(object):
                 else:
                     syllable.final = without_ㅎ[syllable.final]
                         
+            # RR transcribes source-backed ㅎ aspiration, e.g. 잡혀[자펴],
+            # while preserving noun examples such as 묵호 and 집현전.
+            if next_syllable and idx in self._h_aspiration_boundaries:
+                _apply_h_aspiration(syllable, next_syllable)
+
             # Revised Romanization follows pronounced palatalization, e.g.
             # 해돋이[해도지], 같이[가치], 굳히다[구치다].
             if next_syllable and idx in self._palatalization_boundaries:

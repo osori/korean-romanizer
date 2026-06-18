@@ -106,6 +106,49 @@ def test_palatalization_does_not_apply_to_lexical_ieo():
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("좋고", "joko"),
+        ("놓다", "nota"),
+        ("잡혀", "japyeo"),
+        ("낳지", "nachi"),
+    ],
+)
+def test_h_adjacency_rr_correctness(text, expected):
+    # Official NIKL RR examples include 좋고[조코], 놓다[노타],
+    # 잡혀[자펴], and 낳지[나치].
+    # See https://www.korean.go.kr/front_eng/roman/roman_01.do.
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("잡혀", "japyeo"),
+        ("잡히다", "japida"),
+        ("잡힌", "japin"),
+        ("잡혔다", "japyeotda"),
+        ("잡혔어", "japyeosseo"),
+    ],
+)
+def test_h_adjacency_japhida_inflections_rr_correctness(text, expected):
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("묵호", "mukho"),
+        ("집현전", "jiphyeonjeon"),
+    ],
+)
+def test_h_adjacency_noun_examples_do_not_transcribe_aspiration(text, expected):
+    # RR does not transcribe aspirated sounds in nouns where ㅎ follows
+    # ㄱ, ㄷ, or ㅂ, as in official examples 묵호 and 집현전.
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("난로", "날로"),
         ("종로", "종노"),
         ("신라", "실라"),
@@ -173,4 +216,31 @@ def test_rieul_to_n_after_nasal_and_stop_codas_pronunciation(text, expected):
     ],
 )
 def test_palatalization_pronunciation(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("좋고", "조코"),
+        ("놓다", "노타"),
+        ("잡혀", "자펴"),
+        ("낳지", "나치"),
+        ("묵호", "묵호"),
+        ("집현전", "집현전"),
+    ],
+)
+def test_h_adjacency_pronunciation(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("잡혀", "자펴"),
+        ("잡히다", "자피다"),
+        ("잡힌", "자핀"),
+    ],
+)
+def test_h_adjacency_japhida_inflections_pronunciation(text, expected):
     assert Pronouncer(text).pronounced == expected
