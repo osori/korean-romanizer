@@ -13,12 +13,31 @@ pip install korean_romanizer
 
 ### Basic Usage
 ```python
-from korean_romanizer.romanizer import Romanizer
+from korean_romanizer import romanize
 
-r = Romanizer("안녕하세요")
-r.romanize() 
-# returns 'annyeonghaseyo'
+romanize("안녕하세요")
+# returns "annyeonghaseyo"
 ```
+
+The existing class API remains supported for compatibility:
+
+```python
+from korean_romanizer import Romanizer
+
+Romanizer("안녕하세요").romanize()
+# returns "annyeonghaseyo"
+```
+
+Use the `kroman` command for shell workflows:
+
+```bash
+kroman 안녕하세요
+# annyeonghaseyo
+```
+
+`Pronouncer` and `Syllable` are also exported as lower-level compatibility
+APIs. Constants, tables, and helper functions are internal implementation
+details and should not be imported by application code.
 
 ## Development
 

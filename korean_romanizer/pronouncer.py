@@ -216,6 +216,8 @@ def _apply_h_aspiration(syllable, next_syllable):
 
 
 class Pronouncer(object):
+    """Apply Korean pronunciation substitutions before romanization."""
+
     def __init__(self, text):
         self._h_aspiration_boundaries = _find_h_aspiration_boundaries(text)
         self._n_r_to_n_boundaries = _find_n_r_to_n_boundaries(text)

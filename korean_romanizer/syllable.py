@@ -13,6 +13,8 @@ unicode_compatible_consonants = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ'
 unicode_compatible_finals =     ['ᆨ', 'ᆩ', 'ᆫ', 'ᆮ', '_', 'ᆯ', 'ᆷ', 'ᆸ', '_', 'ᆺ', 'ᆻ', 'ᆼ', 'ᆽ', '_', 'ᆾ', 'ᆿ', 'ᇀ', 'ᇁ', 'ᇂ']
 
 class Syllable(object):
+    """Represent a Hangul syllable decomposed into jamo components."""
+
     def __init__(self, char):
         self.char = char
         _is_hangul, _separated = self.separate_syllable(char)
