@@ -48,7 +48,7 @@ def _romanize_syllable(char, previous_syllable=None):
 
 
 def romanize(text: str) -> str:
-    """Return the Revised Romanization for Korean text."""
+    """Romanize Korean text using this package's rules."""
     pronounced = Pronouncer(text).pronounced
     romanized = []
     previous_syllable = None
@@ -71,4 +71,5 @@ class Romanizer(object):
         self.text = text
 
     def romanize(self):
+        """Romanize the stored text using the functional API."""
         return romanize(self.text)

@@ -8,8 +8,9 @@ called out in release notes.
 
 ## Repository Map
 
-- `korean_romanizer/romanizer.py`: public `Romanizer(text).romanize()` flow and
-  per-character romanization flow.
+- `korean_romanizer/romanizer.py`: preferred public `romanize(text)` flow,
+  compatibility `Romanizer(text).romanize()` wrapper, and per-character
+  romanization flow.
 - `korean_romanizer/tables.py`: Revised Romanization vowel, onset, coda, and
   compatibility jamo tables.
 - `korean_romanizer/pronouncer.py`: context-sensitive pronunciation
@@ -37,6 +38,7 @@ Set up a local development checkout:
 ## Rules
 
 - Do not change romanization behavior without adding regression tests.
+- Keep `romanize(text)` as the preferred public API.
 - Keep `Romanizer(text).romanize()` backward compatible.
 - Keep the `kroman` console script backward compatible unless a CLI contract
   change is explicitly documented and tested.

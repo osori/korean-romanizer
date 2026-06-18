@@ -28,12 +28,26 @@ Romanizer("안녕하세요").romanize()
 # returns "annyeonghaseyo"
 ```
 
+The formerly documented module import path also remains supported:
+
+```python
+from korean_romanizer.romanizer import Romanizer
+```
+
 Use the `kroman` command for shell workflows:
 
 ```bash
 kroman 안녕하세요
 # annyeonghaseyo
 ```
+
+Wildcard imports now follow the explicit public API in `__all__`:
+
+```python
+from korean_romanizer import *
+```
+
+This imports only `romanize`, `Romanizer`, `Pronouncer`, and `Syllable`.
 
 `Pronouncer` and `Syllable` are also exported as lower-level compatibility
 APIs. Constants, tables, and helper functions are internal implementation
