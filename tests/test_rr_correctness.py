@@ -122,6 +122,20 @@ def test_h_adjacency_rr_correctness(text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("잡혀", "japyeo"),
+        ("잡히다", "japida"),
+        ("잡힌", "japin"),
+        ("잡혔다", "japyeotda"),
+        ("잡혔어", "japyeosseo"),
+    ],
+)
+def test_h_adjacency_japhida_inflections_rr_correctness(text, expected):
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("묵호", "mukho"),
         ("집현전", "jiphyeonjeon"),
     ],
@@ -217,4 +231,16 @@ def test_palatalization_pronunciation(text, expected):
     ],
 )
 def test_h_adjacency_pronunciation(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("잡혀", "자펴"),
+        ("잡히다", "자피다"),
+        ("잡힌", "자핀"),
+    ],
+)
+def test_h_adjacency_japhida_inflections_pronunciation(text, expected):
     assert Pronouncer(text).pronounced == expected

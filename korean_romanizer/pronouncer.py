@@ -32,6 +32,7 @@ FINAL_RIEUL = 'ᆯ'
 FINAL_RIEUL_T = 'ᆴ'
 FINAL_T = 'ᇀ'
 MEDIAL_I = 'ㅣ'
+MEDIAL_YEO = 'ㅕ'
 
 PALATALIZED_BEFORE_I_BY_FINAL = {
     FINAL_D: (None, INITIAL_J),
@@ -100,10 +101,13 @@ PALATALIZATION_BOUNDARY_WORDS = (
 )
 
 # RR transcribes pronounced aspiration around ㅎ for source-backed examples such
-# as 잡혀[자펴]. It does not transcribe the same surface ㄱ/ㄷ/ㅂ+ㅎ pattern for
-# noun examples such as 묵호 and 집현전, so keep this boundary list explicit.
-H_ASPIRATION_BOUNDARY_WORDS = (
-    '잡혀',
+# as 잡혀[자펴]. The same 잡- + -히/-혀- boundary appears in inflected forms
+# such as 잡힌, 잡히다, 잡혔다, and 잡혔어.
+#
+# Keep this explicit instead of applying every ㄱ/ㄷ/ㅂ+ㅎ boundary, because RR
+# does not transcribe the aspirated sound in noun examples such as 묵호 and 집현전.
+H_ASPIRATION_BOUNDARY_PATTERNS = (
+    ('잡', (MEDIAL_I, MEDIAL_YEO)),
 )
 
 
@@ -130,19 +134,20 @@ def _find_n_r_to_n_boundaries(text):
 def _find_h_aspiration_boundaries(text):
     boundaries = set()
 
-    for word in H_ASPIRATION_BOUNDARY_WORDS:
-        start = text.find(word)
-        while start != -1:
-            for offset in range(len(word) - 1):
-                syllable = Syllable(word[offset])
-                next_syllable = Syllable(word[offset + 1])
-                if (
-                    syllable.final in ASPIRATED_BEFORE_H_BY_FINAL
-                    and next_syllable.initial == INITIAL_H
-                ):
-                    boundaries.add(start + offset)
+    for idx in range(len(text) - 1):
+        for stem_syllable, next_medials in H_ASPIRATION_BOUNDARY_PATTERNS:
+            if text[idx] != stem_syllable:
+                continue
 
-            start = text.find(word, start + 1)
+            syllable = Syllable(text[idx])
+            next_syllable = Syllable(text[idx + 1])
+            if (
+                syllable.final in ASPIRATED_BEFORE_H_BY_FINAL
+                and next_syllable.initial == INITIAL_H
+                and next_syllable.medial in next_medials
+            ):
+                boundaries.add(idx)
+                break
 
     return boundaries
 
