@@ -130,7 +130,8 @@ Packaging and release gaps:
 - The implementation does not cover all Revised Romanization edge cases. Earlier
   checks found known assimilation and palatalization gaps such as
   `같이 -> gati`, `종로 -> jongro`, `신라 -> sinra`, `울릉 -> ulreung`, and
-  `대관령 -> daegwanryeong`. The liquid/nasal cases have since been moved into
+  `대관령 -> daegwanryeong`. Liquid/nasal assimilation, palatalization, and the
+  source-backed `잡-` + `-히/-혀-` h-adjacency family have since been moved into
   RR correctness coverage; remaining rule families should continue to be fixed
   in small, source-backed PRs.
 - Decomposed modern jamo are not consistently romanized. For example, `ᄀ` is
@@ -181,6 +182,35 @@ Packaging and release gaps:
   should come after correctness characterization.
 - There are no benchmarks, so performance changes cannot currently be evaluated
   against representative short strings, long prose, or CLI-sized inputs.
+
+## Progress Since Plan Creation
+
+Status as of 2026-06-19:
+
+- PR #31 added the local development bootstrap and documented dev commands.
+- PR #32 hardened CI with the supported Python matrix, linting, type checks, and
+  package build validation.
+- PR #33 added characterization coverage for existing behavior.
+- PR #34 simplified internal romanizer character handling.
+- PR #35 cleaned up packaging metadata warnings.
+- PR #36 organized romanization tables while preserving compatibility exports.
+- PR #37 fixed source-backed RR liquid/nasal assimilation examples.
+- PR #39 fixed source-backed RR palatalization examples.
+- PR #40 fixed the source-backed h-adjacency example and the related
+  `잡-` + `-히/-혀-` inflection family while retaining noun guards for
+  examples such as `묵호` and `집현전`.
+
+The next recommended modernization PR is PR 3, "Define and Document the Stable
+API." It remains the largest skipped staging item: `korean_romanizer.__init__`
+still re-exports `Romanizer`, `Pronouncer`, and `Syllable`, the README documents
+only the `Romanizer` usage path, and the package has no `__all__` or
+compatibility note. Keep that PR behavior-neutral by documenting the supported
+imports, adding minimal docstrings, and adding import tests; do not move or
+rename internals in the same PR.
+
+If continuing correctness work instead, keep it under PR 7's pattern: one
+source-backed rule family per PR, with noun/proper-name guards where RR special
+provisions require them.
 
 ## Staged Refactor Plan
 
