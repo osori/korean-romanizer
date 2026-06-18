@@ -47,21 +47,29 @@ def _romanize_syllable(char, previous_syllable=None):
     return romanized, syllable
 
 
+def romanize(text: str) -> str:
+    """Romanize Korean text using this package's rules."""
+    pronounced = Pronouncer(text).pronounced
+    romanized = []
+    previous_syllable = None
+    for char in pronounced:
+        if _is_romanizable_hangul(char):
+            romanized_char, previous_syllable = _romanize_syllable(
+                char, previous_syllable)
+            romanized.append(romanized_char)
+        else:
+            romanized.append(char)
+            previous_syllable = None
+
+    return ''.join(romanized)
+
+
 class Romanizer(object):
+    """Compatibility wrapper for romanizing Korean text."""
+
     def __init__(self, text):
         self.text = text
 
     def romanize(self):
-        pronounced = Pronouncer(self.text).pronounced
-        romanized = []
-        previous_syllable = None
-        for char in pronounced:
-            if _is_romanizable_hangul(char):
-                romanized_char, previous_syllable = _romanize_syllable(
-                    char, previous_syllable)
-                romanized.append(romanized_char)
-            else:
-                romanized.append(char)
-                previous_syllable = None
-
-        return ''.join(romanized)
+        """Romanize the stored text using the functional API."""
+        return romanize(self.text)
