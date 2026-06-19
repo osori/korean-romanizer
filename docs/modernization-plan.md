@@ -61,14 +61,14 @@ called out in release notes.
 
 Current tests:
 
-- `tests/test_romanizer.py` contains characterization and RR-correctness
-  examples for common words, spacing, onset/coda mappings, final-consonant
-  substitutions, double-final behavior, compatibility jamo, mixed text, and
-  selected source-backed rule families.
-- `tests/test_public_api.py` locks the preferred `romanize(text)` API, the
-  `Romanizer(text).romanize()` compatibility API, package/module export
-  identity, `__all__`, wildcard-import behavior, and lower-level compatibility
-  exports.
+- `tests/test_romanizer.py` retains the original/basic example coverage,
+  including onset/coda mappings and final-consonant behavior.
+- `tests/test_characterization.py` snapshots existing behavior for mixed text,
+  whitespace, compatibility jamo, `Pronouncer`, and `Syllable`.
+- `tests/test_rr_correctness.py` contains source-backed Revised Romanization
+  rule fixtures.
+- `tests/test_public_api.py` locks the preferred and compatibility APIs,
+  package exports, `__all__`, and wildcard-import behavior.
 - `tests/test_cli.py` checks that `python -m korean_romanizer.cli` matches the
   library for several inputs, prints help, errors on missing arguments, handles
   a long argument list, and smoke-tests the installed `kroman` console script
@@ -160,7 +160,8 @@ Release setup:
 ## Performance Risks
 
 - Romanization is linear in input size conceptually, but it does two character
-  passes and creates `Syllable` objects in both `Pronouncer` and `Romanizer`.
+  passes and creates `Syllable` objects in `Pronouncer` and the romanization
+  pass.
 - `Pronouncer` reconstructs a full pronounced string before romanization. A
   future streaming or single-pass design could avoid intermediate strings, but
   should come after correctness characterization.
