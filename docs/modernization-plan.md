@@ -192,12 +192,6 @@ Status as of 2026-06-19:
   and `kroman` script into project metadata, reduced `setup.py` to a minimal
   shim, and added wheel metadata validation to CI.
 
-PR #38 should be superseded rather than merged. It is a broad stale refactor
-that overlaps already-landed table and romanizer cleanup, predates the
-`romanize(text)` and packaging changes, and attempts compatibility-sensitive
-renames in one large change. Any useful ideas from it should be reintroduced as
-small PR #5 follow-ups with current tests and compatibility wrappers.
-
 The next implementation step should be a narrowly scoped PR #5 cleanup:
 extract pronunciation-rule blocks from `Pronouncer.final_substitute` into
 private helpers one family at a time, preserving rule order and behavior. Each
