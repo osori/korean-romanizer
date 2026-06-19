@@ -293,6 +293,34 @@ def _apply_double_final_linking(syllable, next_syllable):
             double_consonant[1])
 
 
+def _apply_liquid_nasal_assimilation(
+    syllable,
+    next_syllable,
+    *,
+    n_r_to_n_boundary,
+    preserve_rieul_boundary,
+):
+    if (
+        next_syllable.initial == INITIAL_RIEUL
+        and not preserve_rieul_boundary
+    ):
+        pronounced_final = FINAL_BEFORE_RIEUL_TO_PRONOUNCED_FINAL.get(
+            syllable.final)
+        if pronounced_final:
+            syllable.final = pronounced_final
+            next_syllable.initial = INITIAL_N
+        elif syllable.final == FINAL_N:
+            if n_r_to_n_boundary:
+                next_syllable.initial = INITIAL_N
+            else:
+                syllable.final = FINAL_RIEUL
+    elif (
+        syllable.final == FINAL_RIEUL
+        and next_syllable.initial == INITIAL_N
+    ):
+        next_syllable.initial = INITIAL_RIEUL
+
+
 class Pronouncer(object):
     """Apply Korean pronunciation substitutions before romanization."""
 
@@ -350,26 +378,13 @@ class Pronouncer(object):
             # and nasals, e.g. 종로[종노], 왕십리[왕심니], 신라[실라],
             # 별내[별래].
             if next_syllable:
-                if (
-                    next_syllable.initial == INITIAL_RIEUL
-                    and idx not in self._rieul_assimilation_preserved_boundaries
-                ):
-                    pronounced_final = FINAL_BEFORE_RIEUL_TO_PRONOUNCED_FINAL.get(
-                        syllable.final)
-                    if pronounced_final:
-                        syllable.final = pronounced_final
-                        next_syllable.initial = INITIAL_N
-                    elif syllable.final == FINAL_N:
-                        if idx in self._n_r_to_n_boundaries:
-                            next_syllable.initial = INITIAL_N
-                        else:
-                            syllable.final = FINAL_RIEUL
-                elif (
-                    syllable.final == FINAL_RIEUL
-                    and next_syllable.initial == INITIAL_N
-                ):
-                    next_syllable.initial = INITIAL_RIEUL
-                    
+                _apply_liquid_nasal_assimilation(
+                    syllable,
+                    next_syllable,
+                    n_r_to_n_boundary=idx in self._n_r_to_n_boundaries,
+                    preserve_rieul_boundary=idx in self._rieul_assimilation_preserved_boundaries,
+                )
+
             # 5. 홑받침이나 쌍받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
             # 제 음가대로 뒤 음절 첫소리로 옮겨 발음한다.
             if next_syllable and final_is_before_V:
