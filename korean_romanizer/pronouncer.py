@@ -283,6 +283,16 @@ def _apply_h_aspiration(syllable, next_syllable):
         next_syllable.initial = aspirated_initial
 
 
+def _apply_double_final_linking(syllable, next_syllable):
+    # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
+    # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
+    if syllable.final in double_consonant_final and next_syllable.initial == NULL_CONSONANT:
+        double_consonant = double_consonant_final[syllable.final]
+        syllable.final = double_consonant[0]
+        next_syllable.initial = next_syllable.final_to_initial(
+            double_consonant[1])
+
+
 class Pronouncer(object):
     """Apply Korean pronunciation substitutions before romanization."""
 
@@ -334,13 +344,7 @@ class Pronouncer(object):
             if next_syllable and idx in self._palatalization_boundaries:
                 _apply_palatalization(syllable, next_syllable)
 
-            # 6. 겹받침이 모음으로 시작된 조사나 어미, 접미사와 결합되는 경우에는,
-            # 뒤엣것만을 뒤 음절 첫소리로 옮겨 발음한다.(이 경우, ‘ㅅ’은 된소리로 발음함.)
-            if syllable.final in double_consonant_final and next_syllable.initial == NULL_CONSONANT:
-                double_consonant = double_consonant_final[syllable.final]
-                syllable.final = double_consonant[0]
-                next_syllable.initial = next_syllable.final_to_initial(
-                    double_consonant[1])
+            _apply_double_final_linking(syllable, next_syllable)
 
             # Revised Romanization follows pronounced forms for adjacent liquids
             # and nasals, e.g. 종로[종노], 왕십리[왕심니], 신라[실라],
