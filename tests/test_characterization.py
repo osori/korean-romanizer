@@ -101,6 +101,21 @@ def test_double_final_vowel_linking_current_behavior(text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("각이", "가기"),
+        ("옷을", "오슬"),
+        ("낮아", "나자"),
+        ("꽃이", "꼬치"),
+        ("앞에", "아페"),
+        ("강아지", "강아지"),
+    ],
+)
+def test_single_final_vowel_linking_current_behavior(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("놓고", "노코"),
         ("놓다", "노타"),
         ("낳지", "나치"),
