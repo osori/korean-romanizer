@@ -82,6 +82,30 @@ def test_pronouncer_current_behavior(text, expected):
 
 
 @pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("부엌", "부억"),
+        ("옷", "옫"),
+        ("앞", "압"),
+        ("넋", "넉"),
+        ("앉", "안"),
+        ("핥", "할"),
+        ("삶", "삼"),
+    ],
+)
+def test_representative_final_reduction_at_word_end_current_behavior(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+def test_representative_final_reduction_before_consonant_current_behavior():
+    assert Pronouncer("부엌문").pronounced == "부억문"
+
+
+def test_representative_final_preserves_vowel_linking_current_behavior():
+    assert Pronouncer("부엌에").pronounced == "부어케"
+
+
+@pytest.mark.parametrize(
     ("char", "expected"),
     [
         ("각", ("ᄀ", "ㅏ", "ᆨ", "각")),
