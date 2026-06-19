@@ -41,6 +41,13 @@ kroman 안녕하세요
 # annyeonghaseyo
 ```
 
+Check the installed command version:
+
+```bash
+kroman --version
+# kroman <installed-version>
+```
+
 Wildcard imports now follow the explicit public API in `__all__`:
 
 ```python
