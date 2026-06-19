@@ -1,26 +1,30 @@
 # Modernization Plan
 
-This plan covers the `korean-romanizer` Python package in this repository. It is
-based on the current source tree, tests, packaging metadata, and GitHub Actions
-workflows.
+This plan covers the `korean-romanizer` Python package in this repository. It
+is current as of PR #43 and reflects the source tree, tests, packaging metadata,
+and GitHub Actions workflows on `master`.
 
 ## Current Architecture
 
 The project is a small, dependency-free Python package that romanizes Hangul
 text using a rule-based pipeline:
 
-1. `korean_romanizer.syllable.Syllable` decomposes a single precomposed Hangul
-   syllable into initial, medial, and final jamo using Unicode arithmetic. It can
-   also reconstruct the syllable after those pieces are mutated.
+1. `korean_romanizer.romanizer.romanize(text)` is the preferred public library
+   flow. It sends text through pronunciation normalization, then romanizes the
+   pronounced characters.
 2. `korean_romanizer.pronouncer.Pronouncer` builds a list of `Syllable` objects
-   for the input text and applies context-sensitive pronunciation substitutions.
-   It mutates adjacent `Syllable` instances in place, then exposes the resulting
-   string through `pronounced`.
-3. `korean_romanizer.romanizer.Romanizer` passes text through `Pronouncer`, walks
-   the pronounced string character by character, decomposes Hangul syllables
-   again, and maps jamo to Latin strings through module-level dictionaries.
-4. `korean_romanizer.cli` is a thin `argparse` wrapper. It joins positional
-   arguments with spaces, romanizes that string, and prints the result.
+   for the input text and applies context-sensitive pronunciation
+   substitutions. It mutates adjacent `Syllable` instances in place, then
+   exposes the resulting string through `pronounced`.
+3. `korean_romanizer.syllable.Syllable` decomposes a single precomposed Hangul
+   syllable into initial, medial, and final jamo using Unicode arithmetic. It
+   can also reconstruct the syllable after those pieces are mutated.
+4. `korean_romanizer.romanizer.Romanizer` is a backward-compatible wrapper
+   around the functional API. `Romanizer(text).romanize()` returns
+   `romanize(text)`.
+5. `korean_romanizer.cli` is a thin `argparse` wrapper. It joins positional
+   arguments with spaces, romanizes that string through `romanize(text)`, and
+   prints the result.
 
 The package uses a flat source layout, not a `src/` layout. The core tables and
 rules live in module globals rather than structured data files. There are no
@@ -28,155 +32,136 @@ runtime dependencies.
 
 ## Public API Surface
 
-The package currently exposes more than the documented API:
+The preferred public API is:
 
-- `from korean_romanizer.romanizer import Romanizer` is the README-documented
-  library API. `Romanizer(text).romanize()` returns a romanized string.
-- `from korean_romanizer import Romanizer, Pronouncer, Syllable` works because
-  `korean_romanizer/__init__.py` re-exports all three classes.
-- `korean_romanizer.syllable.Syllable` exposes mutable attributes
-  `char`, `initial`, `medial`, and `final`, plus methods
-  `separate_syllable`, `construct_syllable`, `is_hangul`, and
-  `final_to_initial`.
-- `korean_romanizer.pronouncer.Pronouncer` exposes `pronounced` and
-  `final_substitute`.
-- Module-level constants and dictionaries are importable, including
-  `vowel`, `onset`, `coda`, `compat_onset`, `unicode_initial`,
-  `unicode_medial`, `unicode_final`, `unicode_compatible_consonants`,
-  `unicode_compatible_finals`, `double_consonant_final`, and
-  `NULL_CONSONANT`.
-- The package installs the `kroman` console script, mapped to
-  `korean_romanizer.cli:main`.
-- `python -m korean_romanizer.cli ...` also works.
+- `from korean_romanizer import romanize`
+- `romanize(text) -> str`
+- the `kroman` console script
 
-There is no explicit compatibility policy, `__all__`, type information, or
-deprecation path. Any modernization should first decide which of these imports
-are stable public API and which are internal implementation details.
+Compatibility APIs remain supported:
+
+- `from korean_romanizer import Romanizer`
+- `from korean_romanizer.romanizer import Romanizer`
+- `Romanizer(text).romanize()`
+- `from korean_romanizer import Pronouncer, Syllable`
+
+`korean_romanizer.__all__` is explicit and currently contains only
+`romanize`, `Romanizer`, `Pronouncer`, and `Syllable`. Wildcard imports follow
+that contract. `Pronouncer` and `Syllable` are lower-level compatibility exports
+because earlier releases made them importable; refactors should preserve them
+unless a deprecation path is documented and tested first.
+
+Module-level constants, tables, and helper functions are implementation
+details. Some remain importable for historical reasons, so changes to them
+should still be treated carefully, but new application code should not depend
+on them. Public API narrowing should be intentional, documented, tested, and
+called out in release notes.
 
 ## Existing Tests and Gaps
 
 Current tests:
 
-- `tests/test_romanizer.py` contains example-based tests for common words,
-  spacing, onset/coda mappings, final-consonant substitutions, double-final
-  behavior, non-syllable jamo, and some `ㅎ` cases.
+- `tests/test_romanizer.py` retains the original/basic example coverage,
+  including onset/coda mappings and final-consonant behavior.
+- `tests/test_characterization.py` snapshots existing behavior for mixed text,
+  whitespace, compatibility jamo, `Pronouncer`, and `Syllable`.
+- `tests/test_rr_correctness.py` contains source-backed Revised Romanization
+  rule fixtures.
+- `tests/test_public_api.py` locks the preferred and compatibility APIs,
+  package exports, `__all__`, and wildcard-import behavior.
 - `tests/test_cli.py` checks that `python -m korean_romanizer.cli` matches the
-  library for several inputs, prints help, errors on missing arguments, handles a
-  long argument list, and smoke-tests the installed `kroman` console script when
-  available.
-- CI installs the package with `pip install .`, runs a limited `flake8` check,
-  then runs `pytest` on Python 3.10.
+  library for several inputs, prints help, errors on missing arguments, handles
+  a long argument list, and smoke-tests the installed `kroman` console script
+  when available.
+- CI installs the package with `python -m pip install -e ".[dev]"`, runs pytest
+  on Python 3.10, 3.11, 3.12, and 3.13, and runs quality gates on Python 3.10.
 
 Observed test gaps:
 
-- Tests focus on `Romanizer`; `Syllable` and `Pronouncer` internals have no
-  direct unit tests despite carrying most rule complexity.
-- There is no golden corpus from the official Revised Romanization rules or from
-  known dictionary examples.
-- Several important phonological cases are missing or commented out, including
-  liquid/nasal assimilation examples such as `울릉` and `대관령`.
-- There is little coverage for Unicode normalization forms, decomposed jamo,
-  archaic jamo, punctuation, mixed whitespace preservation, invalid input types,
-  and very large text.
+- `Syllable` and `Pronouncer` have more direct coverage than the original plan,
+  but the pronunciation rule pipeline still depends heavily on ordered mutation
+  and should gain focused helper-level tests as it is split.
+- There is no full golden corpus from the official Revised Romanization rules or
+  from checked dictionary examples.
+- Unicode normalization forms, decomposed modern jamo, archaic jamo, invalid
+  input types, and very large text need more explicit coverage.
 - The CLI tests intentionally join arguments with spaces, but do not define
-  whether preserving original whitespace is part of the contract.
-- There is no coverage reporting, no Python version matrix, no build artifact
-  check in CI, and no test for generated package metadata.
+  whether preserving original whitespace is part of the long-term contract.
 
-## Packaging and Release Setup
+## CI, Packaging, and Release Setup
+
+Current CI:
+
+- `.github/workflows/python-app.yml` runs on pushes and pull requests against
+  `master`.
+- The test matrix covers Python 3.10, 3.11, 3.12, and 3.13.
+- The quality-gates job runs `ruff check .`, `mypy korean_romanizer`,
+  `python -m build`, and `python scripts/validate_wheel_metadata.py`.
+- The wheel validator builds a wheel, checks the wheel contents, installs it in
+  a temporary virtual environment, validates emitted metadata, imports the
+  package, exercises `romanize(text)`, and smoke-tests the installed `kroman`
+  console script.
 
 Current packaging:
 
-- `pyproject.toml` declares a PEP 517 build using `setuptools.build_meta` with
-  `setuptools>=42` and `setuptools_scm[toml]>=6.2`.
-- `setup.py` contains package metadata, manually lists `packages =
-  ['korean_romanizer']`, enables `use_scm_version=True`, and registers the
-  `kroman` console script.
-- `setup.cfg` contains legacy metadata (`description-file = README.md`) and an
-  empty `[tool.setuptools_scm]` section.
-- The package name is `korean_romanizer`; the repository and README title use
-  `korean-romanizer`.
+- `pyproject.toml` uses PEP 621 `[project]` metadata.
+- `requires-python` is `>=3.10`, and Python classifiers match the CI matrix.
+- Versions remain dynamic and are derived from Git tags through
+  `setuptools_scm`.
+- The `dev` extra contains the local test, lint, type-check, coverage, and build
+  tooling.
+- The `kroman` entry point is declared under `[project.scripts]`.
+- Package inclusion remains explicit under `[tool.setuptools]`.
+- `setup.py` is a minimal `setuptools.setup()` compatibility shim.
 
 Release setup:
 
-- `.github/workflows/python-app.yml` runs CI on pushes and pull requests against
-  `master` with Python 3.10.
 - `.github/workflows/python-publish.yml` builds with `python -m build` and
   publishes to PyPI using `pypa/gh-action-pypi-publish` when a GitHub release is
   published.
-- Versions come from Git tags through `setuptools_scm`.
-
-Packaging and release gaps:
-
-- README release instructions say publishing is triggered by either a version tag
-  or GitHub release, but the workflow only listens for `release: published`.
-- Metadata still lives mostly in `setup.py`; modern projects usually put this in
-  `[project]` in `pyproject.toml`.
-- There is no `requires-python`. Classifiers list Python 3.4, 3.5, and 3.6 even
-  though CI uses Python 3.10 and modern build tooling may not support those old
-  versions.
-- There is no documented development extra such as `.[dev]`, and no local
-  bootstrap path for tests.
-- There is no `long_description`/`readme` metadata in the modern project table,
-  no typed-package marker, and no project URLs beyond the homepage in
-  `setup.py`.
-- The publish workflow uses a PyPI API token secret rather than PyPI trusted
-  publishing via OpenID Connect.
-- GitHub Actions use older major versions of `actions/checkout` and
-  `actions/setup-python`.
+- The README now documents that publishing path.
+- The publish workflow still uses a PyPI API token secret rather than PyPI
+  trusted publishing through OpenID Connect.
+- The publish workflow still uses older `actions/checkout` and
+  `actions/setup-python` major versions.
 
 ## Likely Correctness Risks
 
-- The implementation does not cover all Revised Romanization edge cases. Earlier
-  checks found known assimilation and palatalization gaps such as
-  `같이 -> gati`, `종로 -> jongro`, `신라 -> sinra`, `울릉 -> ulreung`, and
-  `대관령 -> daegwanryeong`. Liquid/nasal assimilation, palatalization, and the
-  source-backed `잡-` + `-히/-혀-` h-adjacency family have since been moved into
-  RR correctness coverage; remaining rule families should continue to be fixed
-  in small, source-backed PRs.
-- Decomposed modern jamo are not consistently romanized. For example, `ᄀ` is
-  currently preserved because the romanizer's Hangul regex covers precomposed
-  Hangul and compatibility jamo, but not the modern choseong/jongseong Unicode
-  blocks.
+- The implementation does not cover all Revised Romanization edge cases.
+  Liquid/nasal assimilation, palatalization, and the source-backed h-adjacency
+  family have moved into RR correctness coverage, but remaining rule families
+  should continue to be fixed in small, source-backed PRs.
+- Decomposed modern jamo are not consistently romanized because the romanizer
+  supports precomposed Hangul and compatibility jamo, not the modern
+  choseong/jongseong Unicode blocks.
 - The algorithm has no morphology or word-boundary model. Some Korean
   romanization rules depend on morpheme boundaries, proper nouns, names, or
   conventional spellings, which a pure character-neighborhood pass cannot infer.
-- Revised Romanization also has transcription special provisions that are not
-  pure pronunciation rules. For example, `왕십리[왕심니] Wangsimni` follows
-  pronounced assimilation, while administrative-unit examples such as
-  `인왕리 Inwang-ri` preserve the `리` spelling and do not transcribe sound
-  changes around the administrative-unit boundary. The current implementation
-  should treat source-backed examples as guarded compatibility data until a
-  dedicated proper-name/admin-unit layer exists.
+- Revised Romanization includes transcription special provisions that are not
+  pure pronunciation rules. The current implementation should treat
+  source-backed examples as guarded compatibility data until a dedicated
+  proper-name or administrative-unit layer exists.
 - Proper nouns should probably not be handled by hidden guesses in the core
   transliterator. A safer approach is an optional override layer: keep the
   default algorithm deterministic, then allow callers or a curated data file to
-  supply accepted spellings for names, places, and brand terms. That keeps
-  conventional forms explicit, testable, and separable from phonological rules.
+  supply accepted spellings for names, places, and brand terms.
 - `Pronouncer.final_substitute` mutates adjacent syllables in place and depends
-  on rule order. Adding rules without characterization tests could silently
-  change earlier behavior.
+  on rule order. Adding rules or extracting helpers without characterization
+  tests could silently change earlier behavior.
 - `Syllable.__repr__` reconstructs and mutates `self.char`, which is surprising
   for a representation method and could make debugging or future caching
   behavior confusing.
-- Some mappings appear inconsistent or dead, such as `double_consonant_final`
-  containing compatibility `ㅆ` while full-syllable finals use `ᆻ`.
+- Some mappings appear inconsistent or dead, such as double-final data that has
+  compatibility-jamo and full-syllable-final edge cases.
 - `Romanizer` assumes pronunciation normalization has reduced all finals to the
-  seven codas represented in `coda`. Missed substitutions can become `KeyError`
+  codas represented in `coda`. Missed substitutions can become `KeyError`
   failures instead of graceful fallback behavior.
-- Public imports are broader than the documented API, so internal refactors could
-  break users who import `Pronouncer`, `Syllable`, or module-level tables.
 
 ## Performance Risks
 
 - Romanization is linear in input size conceptually, but it does two character
-  passes and creates `Syllable` objects in both `Pronouncer` and `Romanizer`.
-- `Romanizer.romanize()` builds the output with repeated string concatenation.
-  For large inputs this can degrade compared with appending to a list and
-  joining once.
-- The Hangul check calls `re.match` for every character with a string pattern.
-  The regex cache helps, but a precompiled regex or direct Unicode range checks
-  would reduce overhead.
+  passes and creates `Syllable` objects in `Pronouncer` and the romanization
+  pass.
 - `Pronouncer` reconstructs a full pronounced string before romanization. A
   future streaming or single-pass design could avoid intermediate strings, but
   should come after correctness characterization.
@@ -191,110 +176,130 @@ Status as of 2026-06-19:
 - PR #32 hardened CI with the supported Python matrix, linting, type checks, and
   package build validation.
 - PR #33 added characterization coverage for existing behavior.
-- PR #34 simplified internal romanizer character handling.
+- PR #34 simplified internal romanizer character handling, including list-based
+  output accumulation and direct Hangul range checks.
 - PR #35 cleaned up packaging metadata warnings.
 - PR #36 organized romanization tables while preserving compatibility exports.
 - PR #37 fixed source-backed RR liquid/nasal assimilation examples.
 - PR #39 fixed source-backed RR palatalization examples.
-- PR #40 fixed the source-backed h-adjacency example and the related
-  `잡-` + `-히/-혀-` inflection family while retaining noun guards for
-  examples such as `묵호` and `집현전`.
+- PR #40 fixed the source-backed h-adjacency example and the related inflection
+  family while retaining noun guards for compatibility examples.
+- PR #42 added `romanize(text)` as the preferred public API, kept
+  `Romanizer(text).romanize()` as the compatibility API, documented the
+  compatibility policy, and locked the explicit `__all__` contract.
+- PR #43 moved static package metadata into PEP 621 metadata in
+  `pyproject.toml`, kept SCM-derived dynamic versioning, moved the `dev` extra
+  and `kroman` script into project metadata, reduced `setup.py` to a minimal
+  shim, and added wheel metadata validation to CI.
 
-The next recommended modernization PR is PR 3, "Define and Document the Stable
-API." It remains the largest skipped staging item: `korean_romanizer.__init__`
-still re-exports `Romanizer`, `Pronouncer`, and `Syllable`, the README documents
-only the `Romanizer` usage path, and the package has no `__all__` or
-compatibility note. Keep that PR behavior-neutral by documenting the supported
-imports, adding minimal docstrings, and adding import tests; do not move or
-rename internals in the same PR.
+PR #38 should be superseded rather than merged. It is a broad stale refactor
+that overlaps already-landed table and romanizer cleanup, predates the
+`romanize(text)` and packaging changes, and attempts compatibility-sensitive
+renames in one large change. Any useful ideas from it should be reintroduced as
+small PR #5 follow-ups with current tests and compatibility wrappers.
 
-If continuing correctness work instead, keep it under PR 7's pattern: one
-source-backed rule family per PR, with noun/proper-name guards where RR special
-provisions require them.
+The next implementation step should be a narrowly scoped PR #5 cleanup:
+extract pronunciation-rule blocks from `Pronouncer.final_substitute` into
+private helpers one family at a time, preserving rule order and behavior. Each
+helper extraction should keep the existing public surface intact and add focused
+tests only where they clarify order-sensitive behavior.
 
 ## Staged Refactor Plan
 
 ### PR 1: Establish Project Metadata and Development Bootstrap
 
-Scope:
+Status: Complete.
 
-- Move static package metadata from `setup.py` into `pyproject.toml`.
-- Add `requires-python` based on the versions the project intends to support.
-- Add a development extra such as `.[dev]` with `pytest`, `flake8`, and build
-  tooling.
-- Keep `setup.py` only as a compatibility shim if needed.
-- Fix README release wording so it matches the actual workflow.
+Completed scope:
 
-Validation:
+- Static package metadata moved from `setup.py` into PEP 621 metadata in
+  `pyproject.toml`.
+- `requires-python` is `>=3.10`.
+- The `dev` extra documents and installs local development tooling.
+- `setup.py` is only a minimal compatibility shim.
+- README release wording matches the current GitHub-release publishing trigger.
 
-- Build an sdist and wheel.
-- Install the wheel in a clean environment.
-- Run tests through the documented dev command.
+Remaining follow-up:
+
+- Publishing hardening belongs in PR 10, not this stage.
 
 ### PR 2: Harden CI Without Behavior Changes
 
-Scope:
+Status: Complete.
 
-- Add a Python version matrix for supported versions.
-- Add `python -m build` and package metadata checks to CI.
-- Update GitHub Actions to current major versions.
-- Keep the existing lint behavior initially to avoid mixing style churn with
-  functional changes.
+Completed scope:
 
-Validation:
-
-- CI must pass on every supported Python version.
-- Built artifacts should import `korean_romanizer` and expose `kroman`.
+- CI runs the supported Python 3.10-3.13 test matrix.
+- Quality gates run ruff, mypy, package build, and wheel validation.
+- GitHub Actions for the application workflow use current checkout and
+  setup-python major versions.
+- Built artifacts are validated for package contents, installed metadata,
+  `romanize(text)`, and `kroman`.
 
 ### PR 3: Define and Document the Stable API
 
-Scope:
+Status: Complete.
 
-- Add `__all__` for the intended public package exports.
-- Document `Romanizer` and `kroman` as stable APIs.
-- Decide whether `Syllable`, `Pronouncer`, and module constants are supported or
-  internal. If internal, document a deprecation policy before moving them.
-- Add minimal docstrings for stable classes and functions.
+Completed scope:
 
-Validation:
-
-- Add import tests for the stable API.
-- Add a compatibility note to README or a small API document.
+- `romanize(text)` is the preferred public API.
+- `Romanizer(text).romanize()` remains the compatibility API.
+- `Pronouncer` and `Syllable` remain lower-level compatibility exports.
+- `__all__` explicitly defines wildcard-import behavior.
+- Constants, tables, and helper functions are documented as internal
+  implementation details.
+- Import and wildcard behavior are covered by tests.
 
 ### PR 4: Add Characterization Tests for Current Behavior
 
-Scope:
+Status: Substantially complete.
 
-- Convert example tests into a larger parameterized table.
-- Add direct tests for `Syllable` decomposition/reconstruction and
-  `Pronouncer` substitutions.
-- Add tests for mixed scripts, punctuation, compatibility jamo, decomposed jamo,
-  empty strings, and long text.
-- Add known-bug tests as `xfail` for missing romanization rules.
+Completed scope:
 
-Validation:
+- Existing romanizer examples were expanded into broader characterization and
+  RR-correctness coverage.
+- Public API, CLI, mixed text, compatibility jamo, and selected rule families
+  have regression coverage.
+- Several known RR examples have moved from gaps into passing source-backed
+  tests.
 
-- No production behavior changes in this PR.
-- Coverage should make later rule changes easy to review.
+Remaining scope:
+
+- Add more direct helper-level tests for order-sensitive `Pronouncer` behavior
+  as helpers are extracted.
+- Add deeper Unicode normalization, decomposed-jamo, invalid-input, and large
+  text coverage.
+- Build a checked golden corpus if the project wants broader RR conformance
+  claims.
 
 ### PR 5: Internal Cleanup With No Intended Output Changes
 
-Scope:
+Status: Partial.
 
-- Replace repeated output concatenation with list accumulation and `join`.
-- Replace per-character regex calls with a helper such as `is_supported_hangul`.
-- Rename constants to clearer internal names while preserving compatibility
-  aliases where needed.
-- Remove surprising side effects from `Syllable.__repr__`, keeping `__str__`
-  behavior if required by existing code.
-- Split pronunciation rules into small named helpers.
+Completed scope:
 
-Validation:
+- Romanizer output now uses list accumulation and `join`.
+- Per-character regex matching was replaced with direct Hangul range checks.
+- Some table organization has already landed while preserving compatibility
+  exports.
 
-- Characterization tests from PR 4 must pass unchanged.
-- Add a small benchmark baseline before and after cleanup.
+Next narrow scope:
+
+- Extract pronunciation-rule blocks into private helpers one family at a time.
+- Preserve rule order and public behavior.
+- Keep compatibility aliases and public helper methods intact unless a
+  deprecation path is documented and tested first.
+
+Later scope:
+
+- Rename internal constants only where compatibility aliases are preserved.
+- Remove surprising side effects from `Syllable.__repr__`, keeping behavior
+  covered by characterization tests.
+- Add benchmark baselines before performance-motivated changes.
 
 ### PR 6: Improve Unicode Handling
+
+Status: Pending.
 
 Scope:
 
@@ -311,18 +316,20 @@ Validation:
 
 ### PR 7: Add Correctness Fixes in Small Rule-Focused PRs
 
-Scope:
+Status: Partial.
 
-- Implement one phonological rule family per PR, starting with the highest-value
-  known gaps:
-  - palatalization such as `같이`;
-  - nasal and liquid assimilation such as `종로`, `신라`, `울릉`, and `대관령`;
-  - remaining double-final and `ㅎ` edge cases.
+Completed scope:
+
+- Source-backed liquid/nasal assimilation examples landed in PR #37.
+- Source-backed palatalization examples landed in PR #39.
+- A source-backed h-adjacency family landed in PR #40.
+
+Remaining scope:
+
+- Continue with one phonological rule family per PR.
 - Back each rule family with official examples or a checked golden corpus.
 - Keep standard-pronunciation fixes separate from RR special provisions for
-  proper names and administrative units. Add source-backed examples first, then
-  move toward an explicit override or boundary model instead of broad suffix
-  heuristics.
+  proper names and administrative units.
 - Mark behavior-changing releases clearly.
 
 Validation:
@@ -331,6 +338,8 @@ Validation:
 - Add regression examples for every fixed case.
 
 ### PR 8: Modernize the CLI Contract
+
+Status: Pending.
 
 Scope:
 
@@ -348,6 +357,8 @@ Validation:
 
 ### PR 9: Add Benchmarks and Performance Improvements
 
+Status: Pending.
+
 Scope:
 
 - Add a lightweight benchmark script or pytest benchmark suite for short words,
@@ -359,15 +370,17 @@ Scope:
 
 Validation:
 
-- Compare benchmark output against the baseline from PR 5.
+- Compare benchmark output against a checked baseline.
 - Require equal or better correctness coverage before accepting speedups.
 
 ### PR 10: Harden Publishing
 
+Status: Pending.
+
 Scope:
 
 - Move PyPI publishing to trusted publishing with `id-token: write`.
-- Align release triggers with the documented process.
+- Update the publish workflow to current action major versions.
 - Add artifact upload for release builds.
 - Add a changelog or release notes checklist.
 
@@ -380,16 +393,18 @@ Validation:
 
 ### PR 11: Prepare a v1.0.x Release
 
+Status: Future.
+
 Scope:
 
 - Decide the minimum public API and behavior guarantees for the first stable
   release.
 - Review any remaining known correctness gaps and either fix them, document
   them, or mark them as explicitly out of scope for 1.0.
-- Freeze the compatibility policy for `Romanizer`, `kroman`, and any supported
-  lower-level imports.
-- Cut the first `v1.0.x` release only after CI, packaging, and release automation
-  are reliable.
+- Freeze the compatibility policy for `romanize(text)`, `Romanizer`, `kroman`,
+  and any supported lower-level imports.
+- Cut the first `v1.0.x` release only after CI, packaging, and release
+  automation are reliable.
 
 Validation:
 
