@@ -193,6 +193,31 @@ def _find_rieul_assimilation_preserved_boundaries(text):
     return boundaries
 
 
+def _apply_representative_final(
+    syllable,
+    *,
+    is_last_syllable,
+    final_is_before_consonant,
+):
+    # 1. 받침 ‘ㄲ, ㅋ’, ‘ㅅ, ㅆ, ㅈ, ㅊ, ㅌ’, ‘ㅍ’은 어말 또는 자음 앞에서 각각 대표음 [ㄱ, ㄷ, ㅂ]으로 발음한다.
+    # 2. 겹받침 ‘ㄳ’, ‘ㄵ’, ‘ㄼ, ㄽ, ㄾ’, ‘ㅄ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㄴ, ㄹ, ㅂ]으로 발음한다.
+    # 3. 겹받침 ‘ㄺ, ㄻ, ㄿ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㅁ, ㅂ]으로 발음한다.
+    # <-> 단, 국어의 로마자 표기법 규정에 의해 된소리되기는 표기에 반영하지 않으므로 제외.
+    if is_last_syllable or final_is_before_consonant:
+        if (syllable.final in ['ᆩ', 'ᆿ', 'ᆪ', 'ᆰ']):
+            syllable.final = 'ᆨ'
+        elif (syllable.final in ['ᆺ', 'ᆻ', 'ᆽ', 'ᆾ', 'ᇀ']):
+            syllable.final = 'ᆮ'
+        elif (syllable.final in ['ᇁ', 'ᆹ', 'ᆵ']):
+            syllable.final = 'ᆸ'
+        elif (syllable.final in ['ᆬ']):
+            syllable.final = 'ᆫ'
+        elif (syllable.final in ['ᆲ', 'ᆳ', 'ᆴ']):
+            syllable.final = 'ᆯ'
+        elif (syllable.final in ['ᆱ']):
+            syllable.final = 'ᆷ'
+
+
 def _apply_palatalization(syllable, next_syllable):
     if next_syllable.medial != MEDIAL_I:
         return
@@ -248,23 +273,11 @@ class Pronouncer(object):
 
             is_last_syllable = syllable.final and next_syllable is None
 
-            # 1. 받침 ‘ㄲ, ㅋ’, ‘ㅅ, ㅆ, ㅈ, ㅊ, ㅌ’, ‘ㅍ’은 어말 또는 자음 앞에서 각각 대표음 [ㄱ, ㄷ, ㅂ]으로 발음한다.
-            # 2. 겹받침 ‘ㄳ’, ‘ㄵ’, ‘ㄼ, ㄽ, ㄾ’, ‘ㅄ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㄴ, ㄹ, ㅂ]으로 발음한다.
-            # 3. 겹받침 ‘ㄺ, ㄻ, ㄿ’은 어말 또는 자음 앞에서 각각 [ㄱ, ㅁ, ㅂ]으로 발음한다.
-            # <-> 단, 국어의 로마자 표기법 규정에 의해 된소리되기는 표기에 반영하지 않으므로 제외.
-            if is_last_syllable or final_is_before_C:
-                if (syllable.final in ['ᆩ', 'ᆿ', 'ᆪ', 'ᆰ']):
-                    syllable.final = 'ᆨ'
-                elif (syllable.final in ['ᆺ', 'ᆻ', 'ᆽ', 'ᆾ', 'ᇀ']):
-                    syllable.final = 'ᆮ'
-                elif (syllable.final in ['ᇁ', 'ᆹ', 'ᆵ']):
-                    syllable.final = 'ᆸ'
-                elif (syllable.final in ['ᆬ']):
-                    syllable.final = 'ᆫ'
-                elif (syllable.final in ['ᆲ', 'ᆳ', 'ᆴ']):
-                    syllable.final = 'ᆯ'
-                elif (syllable.final in ['ᆱ']):
-                    syllable.final = 'ᆷ'
+            _apply_representative_final(
+                syllable,
+                is_last_syllable=is_last_syllable,
+                final_is_before_consonant=final_is_before_C,
+            )
 
             # 4. 받침 ‘ㅎ’의 발음은 다음과 같다.
             if syllable.final in ['ᇂ', 'ᆭ', 'ᆶ']:
