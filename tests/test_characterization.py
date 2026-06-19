@@ -69,8 +69,6 @@ def test_final_consonant_rules_current_behavior(text, expected):
     ("text", "expected"),
     [
         ("좋습니다", "조씁니다"),
-        ("낳은", "나은"),
-        ("싫어", "시러"),
         ("넋없다", "넉섭다"),
         ("값있는", "갑싣는"),
         ("외곬으로", "외골쓰로"),
@@ -78,6 +76,29 @@ def test_final_consonant_rules_current_behavior(text, expected):
     ],
 )
 def test_pronouncer_current_behavior(text, expected):
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("놓고", "노코"),
+        ("놓다", "노타"),
+        ("낳지", "나치"),
+        ("많소", "만쏘"),
+        ("좋니", "존니"),
+        ("닿는", "단는"),
+        ("놓아", "노아"),
+        ("낳은", "나은"),
+        ("싫어", "시러"),
+        ("뚫리다", "뚤리다"),
+        ("좋", "조"),
+        ("않", "안"),
+        ("앓", "알"),
+    ],
+)
+def test_final_h_rules_current_behavior(text, expected):
+    # Characterize preserved final-ㅎ pronunciation behavior, not RR claims.
     assert Pronouncer(text).pronounced == expected
 
 
