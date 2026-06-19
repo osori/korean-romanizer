@@ -82,6 +82,25 @@ def test_pronouncer_current_behavior(text, expected):
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
+        ("없어", "업서"),
+        ("앉아", "안자"),
+        ("닭이", "달기"),
+        ("밟아", "발바"),
+        ("닮아", "달마"),
+        ("삯을", "삭슬"),
+        ("읊어", "을퍼"),
+        ("곬이", "골씨"),
+        ("훑어", "훌터"),
+    ],
+)
+def test_double_final_vowel_linking_current_behavior(text, expected):
+    # Preserved behavior fixtures, not new RR correctness claims.
+    assert Pronouncer(text).pronounced == expected
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
         ("놓고", "노코"),
         ("놓다", "노타"),
         ("낳지", "나치"),
