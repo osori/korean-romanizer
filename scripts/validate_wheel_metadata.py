@@ -47,17 +47,23 @@ def build_wheel(dist_dir: Path) -> Path:
 
 
 def validate_wheel_contents(wheel_path: Path) -> None:
-    blocked_prefixes = (".github/", "build/", "dist/", "docs/", "scripts/", "tests/")
     with zipfile.ZipFile(wheel_path) as wheel:
         names = wheel.namelist()
 
-    package_files = [name for name in names if name.startswith(f"{DIST_NAME}/")]
-    if not package_files:
+    dist_info_prefixes = [name for name in names if name.startswith(f"{DIST_NAME}-") and ".dist-info/" in name]
+    dist_info_roots = {name.split(".dist-info/", maxsplit=1)[0] + ".dist-info/" for name in dist_info_prefixes}
+    if len(dist_info_roots) != 1:
+        raise AssertionError(f"Expected exactly one {DIST_NAME} .dist-info tree, found: {sorted(dist_info_roots)}")
+
+    dist_info_root = dist_info_roots.pop()
+    allowed_prefixes = (f"{DIST_NAME}/", dist_info_root)
+
+    if not any(name.startswith(f"{DIST_NAME}/") for name in names):
         raise AssertionError(f"Wheel does not contain the {DIST_NAME} package")
 
-    unexpected = sorted(name for name in names if name.startswith(blocked_prefixes))
+    unexpected = sorted(name for name in names if not name.startswith(allowed_prefixes))
     if unexpected:
-        raise AssertionError(f"Wheel contains non-package project files: {unexpected}")
+        raise AssertionError(f"Wheel contains unexpected top-level files: {unexpected}")
 
 
 def validate_installed_metadata(python: Path, work_dir: Path) -> None:

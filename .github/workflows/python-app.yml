@@ -59,3 +59,5 @@ jobs:
       run: python -m mypy korean_romanizer
     - name: Build package
       run: python -m build
+    - name: Validate wheel metadata
+      run: python scripts/validate_wheel_metadata.py
