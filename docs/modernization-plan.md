@@ -1,7 +1,7 @@
 # Modernization Plan
 
 This plan covers the `korean-romanizer` Python package in this repository. It
-is current as of PR #43 and reflects the source tree, tests, packaging metadata,
+is current as of PR #53 and reflects the source tree, tests, packaging metadata,
 and GitHub Actions workflows on `master`.
 
 ## Current Architecture
@@ -65,14 +65,19 @@ Current tests:
   including onset/coda mappings and final-consonant behavior.
 - `tests/test_characterization.py` snapshots existing behavior for mixed text,
   whitespace, compatibility jamo, `Pronouncer`, and `Syllable`.
+- `tests/test_unicode_characterization.py` snapshots current NFC/NFD,
+  decomposed modern jamo, compatibility-jamo decomposition, mixed text,
+  whitespace, and unsupported archaic-jamo behavior.
 - `tests/test_rr_correctness.py` contains source-backed Revised Romanization
   rule fixtures.
 - `tests/test_public_api.py` locks the preferred and compatibility APIs,
   package exports, `__all__`, and wildcard-import behavior.
 - `tests/test_cli.py` checks that `python -m korean_romanizer.cli` matches the
   library for several inputs, prints help, errors on missing arguments, handles
-  a long argument list, and smoke-tests the installed `kroman` console script
-  when available.
+  a long argument list, supports `--version`, and smoke-tests the installed
+  `kroman` console script when available.
+- `tests/test_benchmarks.py` smoke-tests the dependency-free benchmark CLI in
+  human-readable and JSON modes.
 - CI installs the package with `python -m pip install -e ".[dev]"`, runs pytest
   on Python 3.10, 3.11, 3.12, and 3.13, and runs quality gates on Python 3.10.
 
@@ -80,11 +85,13 @@ Observed test gaps:
 
 - `Syllable` and `Pronouncer` have more direct coverage than the original plan,
   but the pronunciation rule pipeline still depends heavily on ordered mutation
-  and should gain focused helper-level tests as it is split.
+  and should gain focused helper-level tests before helper behavior changes.
 - There is no full golden corpus from the official Revised Romanization rules or
   from checked dictionary examples.
-- Unicode normalization forms, decomposed modern jamo, archaic jamo, invalid
-  input types, and very large text need more explicit coverage.
+- Unicode normalization behavior is characterized, but the project still needs
+  an explicit policy decision before changing NFC/NFD, decomposed-jamo, or
+  archaic-jamo behavior. Invalid input types and very large text still need
+  explicit coverage.
 - The CLI tests intentionally join arguments with spaces, but do not define
   whether preserving original whitespace is part of the long-term contract.
 
@@ -146,8 +153,9 @@ Release setup:
   default algorithm deterministic, then allow callers or a curated data file to
   supply accepted spellings for names, places, and brand terms.
 - `Pronouncer.final_substitute` mutates adjacent syllables in place and depends
-  on rule order. Adding rules or extracting helpers without characterization
-  tests could silently change earlier behavior.
+  on rule order. The major rule blocks now dispatch to private helpers, but
+  helper edits or new rule families still need characterization tests to avoid
+  silent behavior changes.
 - `Syllable.__repr__` reconstructs and mutates `self.char`, which is surprising
   for a representation method and could make debugging or future caching
   behavior confusing.
@@ -165,12 +173,14 @@ Release setup:
 - `Pronouncer` reconstructs a full pronounced string before romanization. A
   future streaming or single-pass design could avoid intermediate strings, but
   should come after correctness characterization.
-- There are no benchmarks, so performance changes cannot currently be evaluated
-  against representative short strings, long prose, or CLI-sized inputs.
+- A dependency-free benchmark baseline now covers short words, a sentence, long
+  repeated prose, mixed text, and CLI-sized multiword input. It is intended for
+  local before/after comparisons, not committed machine-specific timing results
+  or CI thresholds.
 
 ## Progress Since Plan Creation
 
-Status as of 2026-06-19:
+Status as of 2026-06-22:
 
 - PR #31 added the local development bootstrap and documented dev commands.
 - PR #32 hardened CI with the supported Python matrix, linting, type checks, and
@@ -191,12 +201,33 @@ Status as of 2026-06-19:
   `pyproject.toml`, kept SCM-derived dynamic versioning, moved the `dev` extra
   and `kroman` script into project metadata, reduced `setup.py` to a minimal
   shim, and added wheel metadata validation to CI.
+- PR #46 extracted representative-final pronunciation substitutions into a
+  private helper.
+- PR #47 extracted final-`h` pronunciation substitutions into a private helper.
+- PR #48 extracted double-final vowel-linking substitutions into a private
+  helper.
+- PR #49 added Unicode characterization coverage for NFC precomposed Hangul,
+  equivalent NFD pass-through behavior, decomposed modern jamo, compatibility
+  jamo decomposition, mixed normalized text, punctuation/whitespace preservation,
+  and unsupported archaic-jamo pass-through behavior.
+- PR #50 added `kroman --version` and tests for both module and installed
+  console-script execution.
+- PR #51 added the dependency-free `benchmarks.romanization` baseline with
+  scenarios for short words, normal sentences, long repeated prose, mixed text,
+  and CLI-sized multiword input, plus smoke tests for JSON and human-readable
+  output.
+- PR #52 extracted liquid/nasal assimilation substitutions into a private
+  helper.
+- PR #53 extracted single-final vowel-linking substitutions into a private
+  helper. Together with PRs #46, #47, #48, and #52, all current pronunciation
+  rule blocks in `Pronouncer.final_substitute` now dispatch through private
+  helpers while preserving rule order and public behavior.
 
-The next implementation step should be a narrowly scoped PR #5 cleanup:
-extract pronunciation-rule blocks from `Pronouncer.final_substitute` into
-private helpers one family at a time, preserving rule order and behavior. Each
-helper extraction should keep the existing public surface intact and add focused
-tests only where they clarify order-sensitive behavior.
+The next implementation step should be a compatibility-safe `Syllable.__repr__`
+cleanup. It should first add focused characterization tests for current
+representation side effects, then remove the surprising `self.char` mutation
+only if public behavior remains intentionally preserved or the change is
+explicitly documented.
 
 ## Staged Refactor Plan
 
@@ -254,21 +285,24 @@ Completed scope:
   RR-correctness coverage.
 - Public API, CLI, mixed text, compatibility jamo, and selected rule families
   have regression coverage.
+- Unicode normalization behavior and unsupported jamo pass-through behavior are
+  now covered by characterization tests.
 - Several known RR examples have moved from gaps into passing source-backed
   tests.
 
 Remaining scope:
 
-- Add more direct helper-level tests for order-sensitive `Pronouncer` behavior
-  as helpers are extracted.
-- Add deeper Unicode normalization, decomposed-jamo, invalid-input, and large
-  text coverage.
+- Add more direct helper-level tests before changing order-sensitive
+  `Pronouncer` helper behavior.
+- Add invalid-input and large-text characterization.
+- Expand Unicode tests only when the project chooses a desired normalization
+  policy beyond the current behavior snapshots.
 - Build a checked golden corpus if the project wants broader RR conformance
   claims.
 
 ### PR 5: Internal Cleanup With No Intended Output Changes
 
-Status: Partial.
+Status: Substantially complete.
 
 Completed scope:
 
@@ -276,24 +310,27 @@ Completed scope:
 - Per-character regex matching was replaced with direct Hangul range checks.
 - Some table organization has already landed while preserving compatibility
   exports.
-
-Next narrow scope:
-
-- Extract pronunciation-rule blocks into private helpers one family at a time.
-- Preserve rule order and public behavior.
-- Keep compatibility aliases and public helper methods intact unless a
-  deprecation path is documented and tested first.
+- The representative-final, final-`h`, double-final vowel-linking,
+  liquid/nasal assimilation, and single-final vowel-linking rule blocks now live
+  in private helper functions.
 
 Later scope:
 
 - Rename internal constants only where compatibility aliases are preserved.
-- Remove surprising side effects from `Syllable.__repr__`, keeping behavior
-  covered by characterization tests.
-- Add benchmark baselines before performance-motivated changes.
+- Remove surprising side effects from `Syllable.__repr__`, preceded by focused
+  characterization tests and keeping compatibility risks explicit.
+- Use the benchmark baseline before performance-motivated changes.
 
 ### PR 6: Improve Unicode Handling
 
-Status: Pending.
+Status: Partial.
+
+Completed scope:
+
+- Current Unicode normalization behavior is characterized for NFC precomposed
+  Hangul, equivalent NFD pass-through behavior, decomposed modern jamo,
+  compatibility-jamo decomposition, mixed normalized text, whitespace, and
+  unsupported archaic jamo.
 
 Scope:
 
@@ -304,7 +341,8 @@ Scope:
 
 Validation:
 
-- Add tests for NFC/NFD forms and compatibility jamo.
+- Keep the current NFC/NFD and compatibility-jamo characterization tests passing
+  unless a PR intentionally changes and documents the contract.
 - Confirm existing precomposed Hangul outputs remain unchanged except where the
   PR intentionally fixes documented bugs.
 
@@ -333,11 +371,15 @@ Validation:
 
 ### PR 8: Modernize the CLI Contract
 
-Status: Pending.
+Status: Partial: `--version` complete; stdin and whitespace decisions pending.
+
+Completed scope:
+
+- `kroman --version` prints the installed distribution version.
+- Module and console-script version behavior is covered by tests.
 
 Scope:
 
-- Add `--version`.
 - Decide whether stdin support is desired when no positional text is provided.
 - Decide whether whitespace should be preserved exactly or normalized by joining
   positional arguments with spaces.
@@ -351,12 +393,18 @@ Validation:
 
 ### PR 9: Add Benchmarks and Performance Improvements
 
-Status: Pending.
+Status: Partial: benchmark baseline complete; optimizations pending.
+
+Completed scope:
+
+- Added `python -m benchmarks.romanization` with dependency-free benchmark
+  scenarios for short words, a sentence, long repeated prose, mixed text, and
+  CLI-sized multiword input.
+- Added human-readable and JSON output modes.
+- Added benchmark smoke tests that validate expected outputs before timing.
 
 Scope:
 
-- Add a lightweight benchmark script or pytest benchmark suite for short words,
-  long prose, mixed text, and CLI-sized input.
 - Optimize only after the no-behavior-change cleanup and correctness tests are
   in place.
 - Consider reducing duplicate `Syllable` creation once the rule pipeline is well
@@ -364,7 +412,8 @@ Scope:
 
 Validation:
 
-- Compare benchmark output against a checked baseline.
+- Compare benchmark output against the existing baseline before and after any
+  performance-motivated change.
 - Require equal or better correctness coverage before accepting speedups.
 
 ### PR 10: Harden Publishing
