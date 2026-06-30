@@ -12,6 +12,20 @@ unicode_medial_offset = 28
 unicode_compatible_consonants = ['ㄱ', 'ㄲ', 'ㄴ', 'ㄷ', 'ㄸ', 'ㄹ', 'ㅁ', 'ㅂ', 'ㅃ', 'ㅅ', 'ㅆ', 'ㅇ', 'ㅈ', 'ㅉ', 'ㅊ', 'ㅋ', 'ㅌ', 'ㅍ', 'ㅎ']
 unicode_compatible_finals =     ['ᆨ', 'ᆩ', 'ᆫ', 'ᆮ', '_', 'ᆯ', 'ᆷ', 'ᆸ', '_', 'ᆺ', 'ᆻ', 'ᆼ', 'ᆽ', '_', 'ᆾ', 'ᆿ', 'ᇀ', 'ᇁ', 'ᇂ']
 
+
+def _construct_syllable_char(char, initial, medial, final):
+    if 0xAC00 <= ord(char) <= 0xD7A3:
+        initial = ord(initial) - 4352
+        medial = unicode_medial.index(medial)
+        if final is None:
+            final = 0
+        else:
+            final = unicode_final.index(final)
+        return chr((((initial * unicode_initial_offset) + (medial * unicode_medial_offset)) + final) + unicode_offset)
+
+    return char
+
+
 class Syllable(object):
     """Represent a Hangul syllable decomposed into jamo components."""
 
@@ -40,17 +54,7 @@ class Syllable(object):
         return self.is_hangul(char), [initial, medial, final]
     
     def construct_syllable(self, initial, medial, final):
-        if self.is_hangul(self.char):
-            initial = ord(initial) - 4352
-            medial = unicode_medial.index(medial)
-            if final is None:
-                final = 0
-            else:
-                final = unicode_final.index(final)
-            constructed = chr((((initial * unicode_initial_offset) + (medial * unicode_medial_offset)) + final) + unicode_offset)
-        else:
-            constructed = self.char
-            
+        constructed = _construct_syllable_char(self.char, initial, medial, final)
         self.char = constructed
         return constructed
     
@@ -62,8 +66,7 @@ class Syllable(object):
         return unicode_initial[idx]
     
     def __repr__(self):
-        self.construct_syllable(self.initial, self.medial, self.final)
-        return self.char
+        return _construct_syllable_char(self.char, self.initial, self.medial, self.final)
     
     def __str__(self):
         self.char = self.construct_syllable(self.initial, self.medial, self.final)
