@@ -275,6 +275,11 @@ def _apply_final_h_rules(syllable, next_syllable):
         else:
             syllable.final = without_ㅎ[syllable.final]
 
+        # Context-specific branches run first. Any h-bearing coda left over
+        # must still reduce to a coda supported by the romanization table.
+        if syllable.final in without_ㅎ:
+            syllable.final = without_ㅎ[syllable.final]
+
 
 def _apply_h_aspiration(syllable, next_syllable):
     aspirated_initial = ASPIRATED_BEFORE_H_BY_FINAL.get(syllable.final)
