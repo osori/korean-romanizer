@@ -120,6 +120,26 @@ def test_h_adjacency_rr_correctness(text, expected):
 
 
 @pytest.mark.parametrize(
+    ("text", "pronounced", "expected"),
+    [
+        ("많고", "만코", "manko"),
+        ("꿇리다", "꿀리다", "kkullida"),
+    ],
+)
+def test_compound_final_h_at_sourced_hangul_boundaries_rr_correctness(
+    text,
+    pronounced,
+    expected,
+):
+    # Standard Pronunciation Rule Article 12 gives 많고[만코]; the NIKL
+    # Korean Basic Dictionary gives 꿇리다[꿀리다].
+    # See https://www.korean.go.kr/kornorms/regltn/regltnView.do?regltn_code=0002&regltn_no=346
+    # and https://krdict.korean.go.kr/eng/dicSearch/SearchView?ParaWordNo=37901&nation=eng.
+    assert Pronouncer(text).pronounced == pronounced
+    assert romanize(text) == expected
+
+
+@pytest.mark.parametrize(
     ("text", "expected"),
     [
         ("잡혀", "japyeo"),
