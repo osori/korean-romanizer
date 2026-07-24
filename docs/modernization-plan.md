@@ -1,7 +1,8 @@
 # Modernization Plan
 
-This plan is current through PR #57 on 2026-07-23. It replaces the earlier
-open-ended PR checklist with finite work stages leading to v1.0.0.
+This plan is current through PR #58 on 2026-07-24 and includes the Stage 3
+inventory in this change. It replaces the earlier open-ended PR checklist
+with finite work stages leading to v1.0.0.
 
 The project will maintain a **bounded deterministic core**: every Python
 `str` input must produce a `str` without leaking an internal exception, while
@@ -111,10 +112,11 @@ Correctness work is divided into four categories:
    administrative-unit hyphenation, personal-name formatting, and accepted
    conventional spellings remain outside the default core transliterator.
 
-Only passing examples and deliberately implemented locally derivable rules
-belong in the strict RR-correctness suite. Generated combinations may prove a
-safety property such as completion or return type; they must not be presented
-as evidence that invented syllable pairs are linguistically correct.
+Only passing examples, deliberately implemented locally derivable rules, and
+explicitly inventoried narrow exceptions with source-backed regressions belong
+in the strict RR-correctness suite. Generated combinations may prove a safety
+property such as completion or return type; they must not be presented as
+evidence that invented syllable pairs are linguistically correct.
 
 The public data flow remains:
 
@@ -162,7 +164,7 @@ The following work is outside the critical path to v1.0.0:
 
 ## Completed Modernization
 
-The foundation completed before this refresh includes:
+The foundation completed before PR #58 includes:
 
 - development bootstrap, supported-Python CI, characterization tests, and
   packaging-metadata cleanup (PRs #31-#35);
@@ -186,11 +188,15 @@ Recent work closed the previous next step and the first bounded safety stage:
   source-backed `많고` and `꿇리다` fixtures, added the exhaustive local
   coda/follower safety matrix, and created the initial changelog.
 
+- PR #58 refreshed the bounded roadmap, adopted the bounded correctness
+  categories, finite stages, and exit criteria, and named the RR inventory as
+  Stage 3.
+
 ## Work Stages
 
 ### Stage 1: Refresh the Roadmap
 
-**Status:** Complete in this refresh.
+**Status:** Complete in PR #58.
 
 Completed scope:
 
@@ -198,12 +204,14 @@ Completed scope:
 - Record PRs #55-#57 and remove the completed `Syllable.__repr__` task.
 - Replace open-ended PR headings with finite stages and exit criteria.
 - Adopt the bounded correctness categories and v1.0.0 boundary.
+- Name the Stage 3 RR inventory and its source scope as the then-next
+  artifact.
 - Record release-note debt for observable changes since v0.28.0, including
   PR #56.
 
-**Exit criterion:** The canonical roadmap accurately describes `master`, names
-the next artifact and source scope, and contains no completed task under
-remaining work.
+**Exit criterion:** PR #58 accurately described `master` through PR #57,
+named Stage 3 and its source scope as next, contained no completed task under
+remaining work, and met this criterion.
 
 ### Stage 2: Restore String Totality
 
@@ -227,9 +235,10 @@ remains green. PR #57 met this criterion.
 
 ### Stage 3: Build a Bounded RR Inventory
 
-**Status:** Next.
+**Status:** Complete in this inventory refresh.
 
-Create `docs/rr-inventory.md` from every word- and name-level example on the
+Completed scope: `docs/rr-inventory.md` inventories every word- and name-level
+example on the
 National Institute of Korean Language's English
 [Romanization of Korean](https://www.korean.go.kr/front_eng/roman/roman_01.do)
 page as captured on 2026-07-23, including the examples in the Section 2 notes
@@ -238,7 +247,7 @@ existing table tests and are not separate inventory entries. Supporting NIKL
 pronunciation rules or dictionary entries may justify a classification but do
 not expand the primary inventory scope.
 
-Each inventory entry must record:
+Each inventory entry records:
 
 - source section and example;
 - input text and shown pronunciation, when provided;
@@ -250,21 +259,27 @@ Each inventory entry must record:
   limitation, or outside the core contract;
 - related test or issue reference.
 
-General nasal assimilation is a candidate locally derivable family.
-Epenthetic `ㄴ`/`ㄹ` and similar cases must be classified individually because
-their correct application can require morphology or lexical knowledge. Any
-implementation remains one source-backed rule family per behavior-changing
-change.
+`docs/rr-inventory.md` contains exactly 94 examples in 15 groups, measured at
+`bf24151`: 37 passing, 1 locally derivable, 2 morphology/lexicon-dependent,
+and 54 special transcription. Its dispositions are 38 `protected test`, 1
+`one-rule-family candidate`, 2 `documented limitation`, and 53 `outside core
+contract`.
 
-**Exit criterion:** Every example in the dated primary source snapshot has a
-source, category, current result, and explicit disposition. Strict correctness
-tests contain only passing or deliberately implemented locally derivable
-cases. Unimplemented morphology-dependent and special-provision cases are
-documented and do not block release.
+The only next behavior-change candidate is general nasal assimilation,
+represented by 백마[뱅마]. 학여울 and 알약 are documented limitations. Any
+behavior implementation must be a separate source-backed one-rule-family
+change. No runtime behavior or tests changed in this inventory refresh.
+
+**Exit criterion:** Met. Every example in the dated primary source snapshot
+has a source, category, current result, and explicit disposition. Strict
+correctness tests contain only passing cases, deliberately implemented locally
+derivable rules, or explicitly protected narrow exceptions. Unimplemented
+morphology-dependent and special-provision cases are documented and do not
+block release.
 
 ### Stage 4: Finish Contract Decisions
 
-**Status:** Pending after the inventory.
+**Status:** Next.
 
 Decide and document:
 
