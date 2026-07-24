@@ -1,8 +1,8 @@
 # Modernization Plan
 
-This plan is current through PR #58 on 2026-07-24 and includes the Stage 3
-inventory in this change. It replaces the earlier open-ended PR checklist
-with finite work stages leading to v1.0.0.
+This plan is current through PR #59 on 2026-07-24 and records the first Stage 4
+contract decision in this change. It replaces the earlier open-ended PR
+checklist with finite work stages leading to v1.0.0.
 
 The project will maintain a **bounded deterministic core**: every Python
 `str` input must produce a `str` without leaking an internal exception, while
@@ -34,7 +34,7 @@ rules remain Python module data rather than external datasets.
 
 ### Tests and Quality Gates
 
-The current suite collects 244 tests:
+The current suite collects 246 tests:
 
 - `tests/test_characterization.py` preserves mixed text, whitespace,
   compatibility jamo, and existing pronunciation behavior.
@@ -86,9 +86,9 @@ Compatibility surfaces remain supported until an explicit deprecation:
 - the four names exported by `korean_romanizer.__all__`
 
 Mixed non-Korean text, punctuation, and whitespace remain preserved by the
-library unless a focused change is documented and tested. The CLI's
-argument-joining behavior is separately subject to the Stage 4 contract
-decision.
+library unless a focused change is documented and tested. The CLI requires
+positional text, does not read stdin, joins arguments with one space, and
+preserves whitespace within each argument.
 
 Module-level tables, constants, and private helpers remain implementation
 details even when Python makes them importable. Stage 4 will define the
@@ -235,7 +235,7 @@ remains green. PR #57 met this criterion.
 
 ### Stage 3: Build a Bounded RR Inventory
 
-**Status:** Complete in this inventory refresh.
+**Status:** Complete in PR #59.
 
 Completed scope: `docs/rr-inventory.md` inventories every word- and name-level
 example on the
@@ -268,7 +268,7 @@ contract`.
 The only next behavior-change candidate is general nasal assimilation,
 represented by 백마[뱅마]. 학여울 and 알약 are documented limitations. Any
 behavior implementation must be a separate source-backed one-rule-family
-change. No runtime behavior or tests changed in this inventory refresh.
+change. PR #59 changed no runtime behavior or tests.
 
 **Exit criterion:** Met. Every example in the dated primary source snapshot
 has a source, category, current result, and explicit disposition. Strict
@@ -279,13 +279,18 @@ block release.
 
 ### Stage 4: Finish Contract Decisions
 
-**Status:** Next.
+**Status:** In progress; the CLI contract is complete in this change.
 
-Decide and document:
+Completed decision:
+
+- `kroman` requires positional text and does not read stdin. It joins positional
+  arguments with one space, preserves whitespace within each argument, and
+  writes a trailing newline.
+
+Remaining decisions:
 
 - whether Unicode normalization and modern decomposed-jamo handling are
   automatic, optional, or intentionally unchanged;
-- whether `kroman` accepts stdin and how positional whitespace is handled;
 - whether non-string input has an explicit `TypeError` contract or preserves
   current natural exceptions;
 - the supported lower-level compatibility surface, including `Pronouncer`,
