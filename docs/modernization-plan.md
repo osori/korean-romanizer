@@ -112,10 +112,11 @@ Correctness work is divided into four categories:
    administrative-unit hyphenation, personal-name formatting, and accepted
    conventional spellings remain outside the default core transliterator.
 
-Only passing examples and deliberately implemented locally derivable rules
-belong in the strict RR-correctness suite. Generated combinations may prove a
-safety property such as completion or return type; they must not be presented
-as evidence that invented syllable pairs are linguistically correct.
+Only passing examples, deliberately implemented locally derivable rules, and
+explicitly inventoried narrow exceptions with source-backed regressions belong
+in the strict RR-correctness suite. Generated combinations may prove a safety
+property such as completion or return type; they must not be presented as
+evidence that invented syllable pairs are linguistically correct.
 
 The public data flow remains:
 
@@ -260,8 +261,8 @@ Each inventory entry records:
 
 `docs/rr-inventory.md` contains exactly 94 examples in 15 groups, measured at
 `bf24151`: 37 passing, 1 locally derivable, 2 morphology/lexicon-dependent,
-and 54 special transcription. Its dispositions are 37 `protected test`, 1
-`one-rule-family candidate`, 2 `documented limitation`, and 54 `outside core
+and 54 special transcription. Its dispositions are 38 `protected test`, 1
+`one-rule-family candidate`, 2 `documented limitation`, and 53 `outside core
 contract`.
 
 The only next behavior-change candidate is general nasal assimilation,
@@ -271,9 +272,10 @@ change. No runtime behavior or tests changed in this inventory refresh.
 
 **Exit criterion:** Met. Every example in the dated primary source snapshot
 has a source, category, current result, and explicit disposition. Strict
-correctness tests contain only passing or deliberately implemented locally
-derivable cases. Unimplemented morphology-dependent and special-provision
-cases are documented and do not block release.
+correctness tests contain only passing cases, deliberately implemented locally
+derivable rules, or explicitly protected narrow exceptions. Unimplemented
+morphology-dependent and special-provision cases are documented and do not
+block release.
 
 ### Stage 4: Finish Contract Decisions
 

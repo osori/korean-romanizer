@@ -50,8 +50,9 @@ The dispositions are:
   default pronunciation-based API.
 
 `none (inventory only)` means there is no related test or issue and no
-implementation commitment. Morphology/lexicon-dependent and special-
-transcription entries are documented boundaries and do not block v1.0.0.
+implementation commitment. Except for explicitly protected narrow exceptions,
+morphology/lexicon-dependent and special-transcription entries are documented
+boundaries and do not block v1.0.0.
 
 ## Section 2 consonant Note 1
 
@@ -165,6 +166,10 @@ transcription entries are documented boundaries and do not block v1.0.0.
 
 ## Section 3(5) administrative units
 
+The `인왕리` fixture protects only the source-backed `리` boundary spelling in
+the library's lowercase, no-hyphen output. Administrative-unit capitalization
+and hyphenation remain outside the core contract.
+
 | Input | Shown pronunciation | NIKL RR | Current result | Category | Disposition | Related test or issue |
 | --- | --- | --- | --- | --- | --- | --- |
 | 충청북도 | — | Chungcheongbuk-do | chungcheongbukdo | special transcription | outside core contract | none (inventory only) |
@@ -174,7 +179,7 @@ transcription entries are documented boundaries and do not block v1.0.0.
 | 도봉구 | — | Dobong-gu | dobonggu | special transcription | outside core contract | none (inventory only) |
 | 신창읍 | — | Sinchang-eup | sinchangeup | special transcription | outside core contract | none (inventory only) |
 | 삼죽면 | — | Samjuk-myeon | samjukmyeon | special transcription | outside core contract | none (inventory only) |
-| 인왕리 | — | Inwang-ri | inwangri | special transcription | outside core contract | tests/test_rr_correctness.py::test_administrative_unit_ri_preserves_rr_spelling |
+| 인왕리 | — | Inwang-ri | inwangri | special transcription | protected test | tests/test_rr_correctness.py::test_administrative_unit_ri_preserves_rr_spelling |
 | 당산동 | — | Dangsan-dong | dangsandong | special transcription | outside core contract | none (inventory only) |
 | 봉천1동 | — | Bongcheon 1(il) -dong | bongcheon1dong | special transcription | outside core contract | none (inventory only) |
 | 종로 2가 | — | Jongno 2(i) -ga | jongno 2ga | special transcription | outside core contract | none (inventory only) |
@@ -235,18 +240,20 @@ Category counts:
 
 Disposition counts:
 
-- 37 `protected test`
+- 38 `protected test`
 - 1 `one-rule-family candidate`
 - 2 `documented limitation`
-- 54 `outside core contract`
+- 53 `outside core contract`
 
 The next behavior-change candidate is only the general nasal-assimilation
 family represented by 백마[뱅마]. The documented morphology/lexicon limitations
 are 학여울 and 알약; they are not implementation targets.
 
-The seven special-transcription groups outside the core contract are Section
-3(2) optional pronunciation-disambiguating hyphen, Section 3(3) proper-name
-capitalization, Section 3(4) personal-name formatting, Section 3(4) given-name
-assimilation exception, Section 3(5) administrative units, Section 3(6)
-geographic features, cultural properties, and structures, and Section 3(8)
-reversible spelling-based transcription.
+The seven special-transcription groups are generally outside the core contract:
+Section 3(2) optional pronunciation-disambiguating hyphen, Section 3(3)
+proper-name capitalization, Section 3(4) personal-name formatting, Section
+3(4) given-name assimilation exception, Section 3(5) administrative units,
+Section 3(6) geographic features, cultural properties, and structures, and
+Section 3(8) reversible spelling-based transcription. The protected `인왕리`
+boundary-spelling exception does not extend that contract to administrative
+capitalization or hyphenation.
