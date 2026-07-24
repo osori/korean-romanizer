@@ -41,6 +41,10 @@ kroman 안녕하세요
 # annyeonghaseyo
 ```
 
+`kroman` requires positional text and does not read stdin. Multiple arguments
+are joined with one space; whitespace inside each quoted argument is preserved.
+Output ends with a newline.
+
 Check the installed command version:
 
 ```bash

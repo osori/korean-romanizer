@@ -103,10 +103,26 @@ def test_cli_version():
 
 
 @pytest.mark.parametrize("stdin", [None, "안녕하세요\n"])
-def test_cli_no_args_shows_usage(stdin):
+def test_cli_requires_positional_text_even_with_stdin(stdin):
     proc = _run_cli([], input=stdin)
-    assert proc.returncode != 0
-    assert "usage" in proc.stderr.lower()
+    assert proc.returncode == 2
+    assert proc.stdout == ""
+    assert proc.stderr.lower().startswith("usage:")
+    assert "arguments are required: text" in proc.stderr
+
+
+def test_cli_ignores_stdin_when_positional_text_is_present():
+    proc = _run_cli(["서울"], input="부산\n")
+    assert proc.returncode == 0
+    assert proc.stderr == ""
+    assert proc.stdout == "seoul\n"
+
+
+def test_cli_preserves_intra_argument_whitespace_and_joins_arguments():
+    proc = _run_cli([" 안녕\t", "  서울 "])
+    assert proc.returncode == 0
+    assert proc.stderr == ""
+    assert proc.stdout == " annyeong\t   seoul \n"
 
 
 def test_cli_long_input():
